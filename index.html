@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Old Time Radio – Channel Player (Lab)</title>
+  <title>Old Time Radio Archive — Hosted by Golden Radio Hour</title>
 
   <style>
     :root{
@@ -14,13 +14,10 @@
       --text:#f2f2f2;
       --muted:rgba(255,255,255,.70);
       --muted2:rgba(255,255,255,.55);
-      --glow:rgba(255,255,255,.85);
       --accent:#f5c24b;
       --accent2:#d7a53a;
-      --shadow:rgba(0,0,0,.6);
       --radius:18px;
     }
-
     *{ box-sizing:border-box; }
     html,body{ height:100%; }
     body{
@@ -35,32 +32,55 @@
       overflow-x:hidden;
     }
 
-    /* Art-deco-ish headline vibe */
-    .deco{
-      letter-spacing:.5px;
-      text-transform: none;
-      font-weight: 500;
-      font-size: 34px;
-      color: rgba(255,255,255,.92);
-      text-shadow:
-        0 0 12px rgba(255,255,255,.20),
-        0 0 26px rgba(255,255,255,.10);
-    }
-    .decoSmall{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      letter-spacing: 1px;
-      font-size: 12px;
-      color: rgba(255,255,255,.70);
-    }
-
     .app{
       max-width: 980px;
       margin: 0 auto;
       padding: 14px 12px 26px;
     }
 
+    /* BACKGROUND LAYER (video/image/canvas-like) */
+    .bgLayer{
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events:none;
+      overflow:hidden;
+      background: transparent;
+    }
+    .bgLayer::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background: rgba(0,0,0,.45);
+    }
+    .bgMedia{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      opacity:.65;
+      display:none;
+      filter: saturate(0.9) contrast(1.05);
+    }
+    .bgStars{
+      position:absolute;
+      inset:0;
+      display:none;
+      opacity:.22;
+      background-image:
+        radial-gradient(circle, rgba(255,255,255,.85) 1px, transparent 2px),
+        radial-gradient(circle, rgba(255,255,255,.55) 1px, transparent 2px),
+        radial-gradient(circle, rgba(255,255,255,.35) 1px, transparent 2px);
+      background-size: 220px 220px, 280px 280px, 340px 340px;
+      background-position: 20px 30px, 120px 80px, 40px 140px;
+    }
+
     /* Top bar */
     .topbar{
+      position: sticky;
+      top: 10px;
+      z-index: 10;
       display:flex;
       align-items:center;
       justify-content:space-between;
@@ -68,11 +88,8 @@
       padding: 14px 14px;
       border:1px solid var(--line);
       border-radius: var(--radius);
-      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.25));
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.30));
       box-shadow: 0 18px 55px rgba(0,0,0,.55);
-      position: sticky;
-      top: 10px;
-      z-index: 10;
       backdrop-filter: blur(8px);
     }
     .topLeft, .topRight{
@@ -130,14 +147,24 @@
       padding: 6px;
       filter: drop-shadow(0 1px 1px rgba(0,0,0,.55));
     }
+
     .titleWrap{ min-width:0; }
     .title{
       margin:0;
       font-weight: 650;
-      letter-spacing:.6px;
-      font-size: 28px;
+      letter-spacing:.4px;
+      font-size: 18px;
+      line-height:1.15;
       color: rgba(255,255,255,.95);
       text-shadow: 0 0 14px rgba(255,255,255,.20);
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+    }
+    .subtitle{
+      margin-top: 2px;
+      font-size: 12px;
+      color: rgba(255,255,255,.62);
       white-space: nowrap;
       overflow:hidden;
       text-overflow: ellipsis;
@@ -145,19 +172,20 @@
 
     /* Stage */
     .stage{
+      position: relative;
+      z-index: 2;
       margin-top: 14px;
       border: 1px solid var(--line);
       border-radius: var(--radius);
       background:
         radial-gradient(900px 320px at 50% 0%, rgba(255,255,255,.05), transparent 58%),
-        rgba(0,0,0,.45);
+        rgba(0,0,0,.52);
       box-shadow: 0 22px 70px rgba(0,0,0,.60);
       overflow:hidden;
     }
-
     .stageInner{
       padding: 20px 16px 14px;
-      min-height: 330px;
+      min-height: 320px;
       display:flex;
       flex-direction:column;
       justify-content:center;
@@ -165,22 +193,6 @@
       text-align:center;
       position: relative;
     }
-
-    /* star specks */
-    .specks{
-      position:absolute;
-      inset:0;
-      pointer-events:none;
-      background-image:
-        radial-gradient(circle, rgba(255,255,255,.85) 1px, transparent 2px),
-        radial-gradient(circle, rgba(255,255,255,.55) 1px, transparent 2px),
-        radial-gradient(circle, rgba(255,255,255,.35) 1px, transparent 2px);
-      background-size: 220px 220px, 280px 280px, 340px 340px;
-      background-position: 20px 30px, 120px 80px, 40px 140px;
-      opacity: .22;
-      filter: blur(.1px);
-    }
-
     .stageTopNote{
       margin:0 0 10px;
       text-transform: uppercase;
@@ -189,7 +201,6 @@
       color: rgba(255,255,255,.70);
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     }
-
     .nowLine{
       margin: 0 0 12px;
       font-size: 22px;
@@ -211,13 +222,13 @@
     }
 
     .trackTitle{
-      font-size: 26px;
+      font-size: 24px;
       letter-spacing: 2px;
       text-transform: uppercase;
       font-weight: 500;
       color: rgba(255,255,255,.88);
       text-shadow: 0 0 18px rgba(255,255,255,.14);
-      margin: 0 0 12px;
+      margin: 0 0 10px;
       max-width: 880px;
       padding: 0 12px;
       word-break: break-word;
@@ -238,12 +249,21 @@
     }
     audio{ width:100%; }
 
+    .tinyHint{
+      font-size:12px;
+      color: rgba(255,255,255,.55);
+      margin-top: 8px;
+      text-align:center;
+    }
+
     /* Bottom channel dock */
     .dock{
+      position: relative;
+      z-index: 2;
       margin-top: 14px;
       border: 1px solid var(--line);
       border-radius: var(--radius);
-      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(0,0,0,.40));
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(0,0,0,.45));
       box-shadow: 0 18px 60px rgba(0,0,0,.55);
       padding: 12px 10px 10px;
       overflow-x: auto;
@@ -313,7 +333,7 @@
     .overlay.open{ display:block; }
 
     .modal{
-      max-width: 860px;
+      max-width: 900px;
       margin: 0 auto;
       border-radius: 20px;
       border: 1px solid rgba(255,255,255,.14);
@@ -402,6 +422,63 @@
       color: rgba(255,255,255,.94);
     }
 
+    /* Show picker + episode list */
+    .row{
+      display:flex;
+      flex-wrap:wrap;
+      gap: 10px;
+      align-items:center;
+    }
+    select, input[type="text"]{
+      background: rgba(0,0,0,.28);
+      color: rgba(255,255,255,.92);
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 13px;
+      outline:none;
+      min-width: 220px;
+      max-width: 100%;
+      box-shadow: inset 0 1px 2px rgba(255,255,255,.08);
+    }
+    .episodeBox{
+      margin-top: 10px;
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 14px;
+      overflow:hidden;
+      background: rgba(0,0,0,.20);
+    }
+    .epRow{
+      display:flex;
+      justify-content:space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      cursor:pointer;
+      user-select:none;
+      font-size: 13px;
+    }
+    .epRow:hover{ background: rgba(245,194,75,.10); }
+    .epRow.active{
+      background: linear-gradient(90deg, rgba(245,194,75,.95), rgba(215,165,58,.92));
+      color:#111;
+      font-weight: 700;
+    }
+    .epLeft{
+      min-width:0;
+      overflow:hidden;
+      white-space:nowrap;
+      text-overflow:ellipsis;
+      flex: 1 1 auto;
+    }
+    .epRight{
+      flex: 0 0 auto;
+      color: rgba(255,255,255,.55);
+      font-variant-numeric: tabular-nums;
+    }
+    .epRow.active .epRight{ color:#111; opacity:.85; }
+
+    /* Volume dots */
     .volumeRow{
       display:flex;
       align-items:center;
@@ -447,30 +524,9 @@
       box-shadow: 0 0 10px rgba(255,255,255,.18);
     }
 
-    .scheduleList{
-      margin: 8px 0 0;
-      padding: 0;
-      list-style: none;
-      border-top: 1px solid rgba(255,255,255,.10);
-    }
-    .scheduleList li{
-      padding: 10px 2px;
-      border-bottom: 1px solid rgba(255,255,255,.08);
-      font-size: 13px;
-      color: rgba(255,255,255,.82);
-      display:flex;
-      justify-content:space-between;
-      gap: 10px;
-    }
-    .scheduleList small{
-      color: rgba(255,255,255,.60);
-      font-size: 12px;
-      white-space:nowrap;
-    }
-
-    /* Search bar (top-left) */
+    /* Search (channel filter) */
     .searchWrap{
-      display:none; /* toggled by search icon */
+      display:none;
       gap: 10px;
       align-items:center;
       min-width: min(520px, 60vw);
@@ -487,18 +543,11 @@
       outline:none;
       box-shadow: inset 0 1px 2px rgba(255,255,255,.08);
     }
-    .tinyHint{
-      font-size: 12px;
-      color: rgba(255,255,255,.55);
-      margin-top: 8px;
-      text-align:center;
-    }
 
-    /* Responsive */
     @media (max-width: 640px){
-      .title{ font-size: 22px; }
-      .deco{ font-size: 28px; }
-      .trackTitle{ font-size: 22px; }
+      .title{ font-size: 15px; }
+      .subtitle{ font-size: 11px; }
+      .trackTitle{ font-size: 20px; }
       .chanTile{ width: 78px; }
       .chanLabel{ font-size: 13px; }
       .searchInput{ width: 52vw; }
@@ -507,12 +556,18 @@
 </head>
 
 <body>
-  <div class="app">
+  <!-- Background layer -->
+  <div class="bgLayer" aria-hidden="true">
+    <video class="bgMedia" id="bgVideo" muted loop playsinline></video>
+    <img class="bgMedia" id="bgImage" alt="" />
+    <div class="bgStars" id="bgStars"></div>
+  </div>
+
+  <div class="app" style="position:relative; z-index:2;">
 
     <header class="topbar">
       <div class="topLeft">
-        <button class="iconBtn" id="btnSearch" title="Search">
-          <!-- magnifier -->
+        <button class="iconBtn" id="btnSearch" title="Search in current channel">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
             <path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" stroke="currentColor" stroke-width="2"/>
             <path d="M16.5 16.5 21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -521,22 +576,21 @@
 
         <div class="brand">
           <div class="logo" title="Golden Radio Hour">
-            <!-- optional: upload grh_logo.png; if not, it will show empty but still fine -->
             <img src="grh_logo.png" alt="GRH" onerror="this.style.display='none';" />
           </div>
           <div class="titleWrap">
-            <div class="title">Old Time Radio</div>
+            <div class="title">Old Time Radio Archive — Hosted by Golden Radio Hour</div>
+            <div class="subtitle" id="modeSubtitle">Mode: Channel Radio</div>
           </div>
         </div>
 
         <div class="searchWrap" id="searchWrap">
-          <input id="searchInput" class="searchInput" placeholder="Search current channel..." />
+          <input id="searchInput" class="searchInput" placeholder="Filter current channel..." />
         </div>
       </div>
 
       <div class="topRight">
         <button class="iconBtn" id="btnMenu" title="Menu">
-          <!-- hamburger -->
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
             <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
           </svg>
@@ -546,17 +600,14 @@
 
     <main class="stage">
       <div class="stageInner">
-        <div class="specks"></div>
-
-        <p class="stageTopNote">SELECT A CHANNEL</p>
+        <p class="stageTopNote" id="stageNote">SELECT A CHANNEL</p>
 
         <div class="nowLine" id="nowLine">
           Now Playing on <strong id="channelName">The Suspense Channel</strong>
         </div>
 
-        <!-- decorative divider -->
         <svg class="dividerSwirl" viewBox="0 0 300 28" fill="none" aria-hidden="true">
-          <path d="M10 14c26-18 42 18 68 0s42 18 68 0 42 18 68 0 42 18 68 0"
+          <path d="M10 14c26-18 42 18 68 0s42 18 68 0 42 18 68 0 42 18 68 0 42 18 68 0"
                 stroke="rgba(255,255,255,.72)" stroke-width="2" stroke-linecap="round"/>
           <path d="M70 14c14-10 22 10 36 0s22 10 36 0 22 10 36 0"
                 stroke="rgba(255,255,255,.45)" stroke-width="2" stroke-linecap="round"/>
@@ -567,7 +618,9 @@
 
         <div class="audioWrap">
           <audio id="audio" controls preload="none"></audio>
-          <div class="tinyHint" id="statusHint">Tip: pick a channel below to start continuous play.</div>
+          <div class="tinyHint" id="statusHint">
+            Tip: pick a channel below for continuous play, or open Menu → Browse by Show.
+          </div>
         </div>
       </div>
     </main>
@@ -584,7 +637,6 @@
       <div class="modalTop">
         <div class="modalTitle">Menu</div>
         <button class="closeBtn" id="btnClose" title="Close">
-          <!-- X -->
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
             <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
           </svg>
@@ -594,26 +646,63 @@
       <div class="modalBody">
 
         <div class="section">
+          <h3>Modes</h3>
+          <p>Switch between radio-style channel play and classic show browsing.</p>
+          <div class="pillRow" id="modeRow">
+            <div class="pill active" data-mode="channel">Channel Radio</div>
+            <div class="pill" data-mode="show">Browse by Show</div>
+          </div>
+        </div>
+
+        <div class="section" id="channelSection">
           <h3>Schedule</h3>
-          <p>Select a channel to see what’s coming up.</p>
-
+          <p>Select a channel to see what’s coming up (based on the current shuffled rotation).</p>
           <div class="pillRow" id="modalChannelRow"></div>
-
           <ul class="scheduleList" id="scheduleList"></ul>
+        </div>
+
+        <div class="section" id="showSection" style="display:none;">
+          <h3>Browse by Show</h3>
+          <p>Pick a show, then click an episode to play.</p>
+
+          <div class="row">
+            <select id="showSelect">
+              <option value="__all__">Select a show…</option>
+            </select>
+
+            <input id="showSearch" type="text" placeholder="Filter episodes in this show..." />
+          </div>
+
+          <div class="episodeBox" id="episodeBox"></div>
+        </div>
+
+        <div class="section">
+          <h3>Background</h3>
+          <p>Pick something to watch while listening.</p>
+
+          <div class="pillRow" id="bgRow">
+            <div class="pill active" data-bg="none">None</div>
+            <div class="pill" data-bg="stars">Stars</div>
+            <div class="pill" data-bg="video:bg/stars.mp4">Stars Video</div>
+            <div class="pill" data-bg="video:bg/fireplace.mp4">Fireplace</div>
+            <div class="pill" data-bg="video:bg/rain.mp4">Rain</div>
+            <div class="pill" data-bg="image:bg/noir.jpg">Noir Image</div>
+          </div>
+
+          <p style="margin-top:10px;color:rgba(255,255,255,.60);font-size:12px;">
+            Add your own files in a <strong>bg/</strong> folder (or change these paths). If a file doesn’t exist, it’ll just show nothing.
+          </p>
         </div>
 
         <div class="section">
           <h3>Visualiser</h3>
-          <p>Select a visualiser (placeholder for now).</p>
+          <p>Select a visualiser (UI ready; we can wire real visuals later).</p>
           <div class="pillRow" id="vizRow">
             <div class="pill active" data-viz="none">None</div>
             <div class="pill" data-viz="spiro">Spirograph</div>
             <div class="pill" data-viz="osc">Oscillograph</div>
             <div class="pill" data-viz="phono">Phonograph</div>
           </div>
-          <p style="margin-top:10px;color:rgba(255,255,255,.60);font-size:12px;">
-            Note: Visualizers require Web Audio API + canvas. This UI is ready; we can wire it later.
-          </p>
         </div>
 
         <div class="section">
@@ -628,7 +717,9 @@
 
         <div class="section">
           <h3>Preferences</h3>
-          <p style="margin-bottom:0">This lab build focuses on channels + continuous play. Next upgrades: real schedule, favorites, and real visualizers.</p>
+          <p style="margin-bottom:0">
+            Next upgrades you’ll want: real channel mapping from your Python builder, favorites, and a true canvas visualizer.
+          </p>
         </div>
 
       </div>
@@ -641,27 +732,11 @@
 ========================= */
 const DATA_URL = "./shows.json";
 
-/**
- * CHANNELS you want exposed in the UI.
- * Keep this list aligned with your brand.
- */
 const CHANNELS = [
-  "Future",
-  "Action",
-  "Crime",
-  "Horror",
-  "Suspense",
-  "Western",
-  "Comedy",
-  "Drama",
-  "Sports"
+  "Future","Action","Crime","Horror","Suspense","Western","Comedy","Drama","Sports"
 ];
 
-/**
- * OPTIONAL: Explicit mapping (best long-term).
- * Keys should match `track.show` in your JSON.
- * If a show isn't here, we fall back to heuristics.
- */
+// Best long-term: keep expanding this until it covers your shows.
 const SHOW_TO_CHANNEL = {
   "BBCMarlowe": "Crime",
   "BBC_Chillers": "Horror",
@@ -669,23 +744,29 @@ const SHOW_TO_CHANNEL = {
   "BBC-presents-AlfredHitchcock": "Suspense",
   "bbc-sci-fi-radio-plays-part-five": "Future",
   "bbc-sci-fi-radio-plays-part-nine": "Future"
-  // Add more as you want. You can keep expanding this list over time.
 };
 
 /* =========================
    STATE
 ========================= */
 let allTracks = [];
+let mode = "channel";            // "channel" or "show"
 let currentChannel = "Suspense";
 let channelQueue = [];
 let channelIndex = 0;
 let searchQuery = "";
+
+let currentShow = null;
+let showTracks = [];
+let currentKey = null;
 
 const audioEl = document.getElementById("audio");
 const channelNameEl = document.getElementById("channelName");
 const trackTitleEl = document.getElementById("trackTitle");
 const metaLineEl = document.getElementById("metaLine");
 const statusHintEl = document.getElementById("statusHint");
+const stageNoteEl = document.getElementById("stageNote");
+const modeSubtitleEl = document.getElementById("modeSubtitle");
 
 const dockRowEl = document.getElementById("dockRow");
 const modalChannelRowEl = document.getElementById("modalChannelRow");
@@ -703,6 +784,19 @@ const volDotsEl = document.getElementById("volDots");
 const volDown = document.getElementById("volDown");
 const volUp = document.getElementById("volUp");
 
+const modeRow = document.getElementById("modeRow");
+const channelSection = document.getElementById("channelSection");
+const showSection = document.getElementById("showSection");
+
+const showSelect = document.getElementById("showSelect");
+const showSearch = document.getElementById("showSearch");
+const episodeBox = document.getElementById("episodeBox");
+
+const bgRow = document.getElementById("bgRow");
+const bgVideo = document.getElementById("bgVideo");
+const bgImage = document.getElementById("bgImage");
+const bgStars = document.getElementById("bgStars");
+
 /* =========================
    HELPERS
 ========================= */
@@ -718,48 +812,27 @@ function formatTime(seconds){
   return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
 }
 
-function titleOf(t){
-  return t.displayTitle || t.title || "Untitled";
-}
+function titleOf(t){ return t.displayTitle || t.title || "Untitled"; }
 
 function inferredChannel(track){
-  // 1) If the JSON already has channel, use it
   if (track.channel && CHANNELS.includes(track.channel)) return track.channel;
 
-  // 2) Explicit show mapping
   const show = track.show || track.showTitle || "";
   if (SHOW_TO_CHANNEL[show]) return SHOW_TO_CHANNEL[show];
 
-  // 3) Heuristics (good enough for lab)
   const hay = [
     track.show, track.showTitle, track.title, track.displayTitle, track.genre,
     Array.isArray(track.tags) ? track.tags.join(" ") : ""
   ].map(norm).join(" ");
 
-  if (/(sci[- ]?fi|science fiction|x[- ]?minus[- ]?one|dimension x|space|alien|robot|future|asimov|wells|bradbury|neuromancer)/i.test(hay))
-    return "Future";
-
-  if (/(horror|ghost|chiller|terror|macabre|haunt|nightmare|vampire|werewolf|monster)/i.test(hay))
-    return "Horror";
-
-  if (/(crime|detective|murder|police|dragnet|noir|marlowe|private eye|case|robbery|heist)/i.test(hay))
-    return "Crime";
-
-  if (/(suspense|hitchcock|thriller|mystery|molle|mystery theatre|whistler)/i.test(hay))
-    return "Suspense";
-
-  if (/(western|gunsmoke|cowboy|ranger|frontier|six shooter)/i.test(hay))
-    return "Western";
-
-  if (/(comedy|funny|fibber|mcgee|skelton|variety|sitcom)/i.test(hay))
-    return "Comedy";
-
-  if (/(sports|baseball|boxing|football|basketball|race)/i.test(hay))
-    return "Sports";
-
-  if (/(action|adventure|spy|secret agent|war|battle|mission)/i.test(hay))
-    return "Action";
-
+  if (/(sci[- ]?fi|science fiction|x[- ]?minus[- ]?one|dimension x|space|alien|robot|future|asimov|wells|bradbury)/i.test(hay)) return "Future";
+  if (/(horror|ghost|chiller|terror|macabre|haunt|nightmare|vampire|werewolf|monster)/i.test(hay)) return "Horror";
+  if (/(crime|detective|murder|police|dragnet|noir|marlowe|private eye|case|robbery|heist)/i.test(hay)) return "Crime";
+  if (/(suspense|hitchcock|thriller|mystery|molle|mystery theatre|whistler)/i.test(hay)) return "Suspense";
+  if (/(western|gunsmoke|cowboy|ranger|frontier|six shooter)/i.test(hay)) return "Western";
+  if (/(comedy|funny|fibber|mcgee|skelton|variety|sitcom)/i.test(hay)) return "Comedy";
+  if (/(sports|baseball|boxing|football|basketball|race)/i.test(hay)) return "Sports";
+  if (/(action|adventure|spy|secret agent|war|battle|mission)/i.test(hay)) return "Action";
   return "Drama";
 }
 
@@ -772,8 +845,8 @@ function shuffle(arr){
   return a;
 }
 
-function applySearch(tracks){
-  const q = norm(searchQuery).trim();
+function applySearch(tracks, q){
+  q = norm(q).trim();
   if (!q) return tracks;
   return tracks.filter(t => {
     const hay = [
@@ -782,6 +855,12 @@ function applySearch(tracks){
     ].map(norm).join(" ");
     return hay.includes(q);
   });
+}
+
+function uniqueShows(tracks){
+  const set = new Set();
+  tracks.forEach(t => set.add(t.show || "Unknown"));
+  return [...set].sort((a,b)=>a.localeCompare(b));
 }
 
 function setActiveDock(){
@@ -793,8 +872,366 @@ function setActiveDock(){
   });
 }
 
+function setModeUI(){
+  document.querySelectorAll("#modeRow .pill").forEach(p => p.classList.remove("active"));
+  const active = modeRow.querySelector(`[data-mode="${mode}"]`);
+  if (active) active.classList.add("active");
+
+  channelSection.style.display = (mode === "channel") ? "" : "none";
+  showSection.style.display = (mode === "show") ? "" : "none";
+
+  if (mode === "channel"){
+    modeSubtitleEl.textContent = "Mode: Channel Radio";
+    stageNoteEl.textContent = "SELECT A CHANNEL";
+    document.getElementById("nowLine").style.display = "";
+    document.querySelector(".dividerSwirl").style.display = "";
+  } else {
+    modeSubtitleEl.textContent = "Mode: Browse by Show";
+    stageNoteEl.textContent = "BROWSE BY SHOW";
+    // keep Now Playing line visible but shift meaning
+    channelNameEl.textContent = currentShow ? currentShow : "Select a show";
+  }
+}
+
 /* =========================
-   RENDER
+   CHANNEL MODE
+========================= */
+function buildChannelQueue(channel){
+  const base = allTracks
+    .map(t => ({...t, channel: inferredChannel(t)}))
+    .filter(t => t.channel === channel);
+
+  const filtered = applySearch(base, searchQuery);
+  return shuffle(filtered);
+}
+
+function renderNowPlaying(track){
+  if (mode === "channel"){
+    channelNameEl.textContent = `The ${currentChannel} Channel`;
+  } else {
+    channelNameEl.textContent = currentShow ? currentShow : "Select a show";
+  }
+
+  if (!track){
+    trackTitleEl.textContent = "—";
+    metaLineEl.textContent = "—";
+    return;
+  }
+
+  trackTitleEl.textContent = titleOf(track);
+
+  const show = track.show || track.showTitle || "Unknown Show";
+  const len = formatTime(track.durationSeconds);
+  const extras = [];
+  extras.push(`Show: ${show}`);
+  if (mode === "channel") extras.push(`Channel: ${inferredChannel(track)}`);
+  if (len) extras.push(`Length: ${len}`);
+  metaLineEl.textContent = extras.join(" • ");
+}
+
+function renderSchedule(){
+  scheduleListEl.innerHTML = "";
+
+  if (!channelQueue.length){
+    const li = document.createElement("li");
+    li.textContent = "No items found in this channel.";
+    scheduleListEl.appendChild(li);
+    return;
+  }
+
+  for (let i = 1; i <= 10; i++){
+    const idx = (channelIndex + i) % channelQueue.length;
+    const t = channelQueue[idx];
+
+    const li = document.createElement("li");
+    li.style.padding = "10px 2px";
+    li.style.borderBottom = "1px solid rgba(255,255,255,.08)";
+    li.style.display = "flex";
+    li.style.justifyContent = "space-between";
+    li.style.gap = "10px";
+
+    const left = document.createElement("span");
+    left.textContent = `${i}. ${titleOf(t)}`;
+
+    const right = document.createElement("small");
+    right.textContent = t.show || t.showTitle || "";
+    right.style.color = "rgba(255,255,255,.60)";
+    right.style.whiteSpace = "nowrap";
+
+    li.appendChild(left);
+    li.appendChild(right);
+    scheduleListEl.appendChild(li);
+  }
+}
+
+function loadChannelIndex(i, autoplay){
+  if (!channelQueue.length) return;
+  channelIndex = Math.max(0, Math.min(i, channelQueue.length - 1));
+  const t = channelQueue[channelIndex];
+  currentKey = `channel|${currentChannel}|${channelIndex}`;
+
+  audioEl.src = t.url;
+  renderNowPlaying(t);
+  renderSchedule();
+
+  statusHintEl.textContent =
+    `Channel: ${currentChannel} • ${channelQueue.length} item(s) in rotation` +
+    (searchQuery ? " • filtered" : "") +
+    " • Menu → Browse by Show for manual picking";
+
+  if (autoplay) audioEl.play().catch(()=>{});
+}
+
+function switchChannel(channel, autoplay){
+  mode = "channel";
+  setModeUI();
+
+  currentChannel = channel;
+  channelQueue = buildChannelQueue(currentChannel);
+  channelIndex = 0;
+
+  setActiveDock();
+  renderNowPlaying(channelQueue[0] || null);
+  renderSchedule();
+
+  if (channelQueue.length){
+    audioEl.src = channelQueue[0].url;
+    if (autoplay) audioEl.play().catch(()=>{});
+  } else {
+    audioEl.removeAttribute("src");
+  }
+}
+
+/* =========================
+   SHOW MODE (YOUR OLD PLAYER FEATURE)
+========================= */
+function renderShowSelect(){
+  const shows = uniqueShows(allTracks);
+  showSelect.innerHTML = `<option value="__all__">Select a show…</option>`;
+  for (const show of shows){
+    const opt = document.createElement("option");
+    opt.value = show;
+    opt.textContent = show;
+    showSelect.appendChild(opt);
+  }
+}
+
+function setActiveEpisode(key){
+  episodeBox.querySelectorAll(".epRow.active").forEach(x => x.classList.remove("active"));
+  const el = episodeBox.querySelector(`[data-key="${CSS.escape(key)}"]`);
+  if (el) el.classList.add("active");
+}
+
+function buildShowTracks(showName){
+  const list = allTracks
+    .filter(t => (t.show || "Unknown") === showName)
+    .sort((a,b) => norm(titleOf(a)).localeCompare(norm(titleOf(b))));
+  return list;
+}
+
+function renderEpisodes(){
+  episodeBox.innerHTML = "";
+  if (!currentShow){
+    episodeBox.innerHTML = `<div style="padding:12px;color:rgba(255,255,255,.70)">Pick a show to see episodes.</div>`;
+    return;
+  }
+
+  const q = showSearch.value || "";
+  const filtered = applySearch(showTracks, q);
+
+  if (!filtered.length){
+    episodeBox.innerHTML = `<div style="padding:12px;color:rgba(255,255,255,.70)">No matching episodes.</div>`;
+    return;
+  }
+
+  filtered.forEach((t, idx) => {
+    const key = `show|${currentShow}|${idx}`;
+
+    const row = document.createElement("div");
+    row.className = "epRow";
+    row.dataset.key = key;
+
+    const left = document.createElement("div");
+    left.className = "epLeft";
+    left.textContent = titleOf(t);
+
+    const right = document.createElement("div");
+    right.className = "epRight";
+    right.textContent = formatTime(t.durationSeconds);
+
+    row.appendChild(left);
+    row.appendChild(right);
+
+    row.addEventListener("click", () => {
+      mode = "show";
+      setModeUI();
+
+      currentKey = key;
+      audioEl.src = t.url;
+      renderNowPlaying(t);
+      statusHintEl.textContent = `Show: ${currentShow} • ${filtered.length} episode(s) listed • Use channel dock for radio mode`;
+      setActiveEpisode(key);
+
+      audioEl.play().catch(()=>{});
+    });
+
+    episodeBox.appendChild(row);
+  });
+
+  // If currentKey is a show key, keep highlight after re-render
+  if (currentKey && currentKey.startsWith("show|")) setActiveEpisode(currentKey);
+}
+
+function enterShowMode(){
+  mode = "show";
+  setModeUI();
+  statusHintEl.textContent = "Pick a show, then click an episode to play. Use channel dock anytime to go back to radio mode.";
+}
+
+showSelect.addEventListener("change", () => {
+  const v = showSelect.value;
+  if (v === "__all__"){
+    currentShow = null;
+    showTracks = [];
+    renderEpisodes();
+    renderNowPlaying(null);
+    return;
+  }
+  currentShow = v;
+  showTracks = buildShowTracks(currentShow);
+  renderEpisodes();
+  renderNowPlaying(showTracks[0] || null);
+});
+
+showSearch.addEventListener("input", renderEpisodes);
+
+/* =========================
+   EVENTS + UI WIRING
+========================= */
+audioEl.addEventListener("ended", () => {
+  if (mode !== "channel") return; // only auto-advance in channel radio mode
+  if (!channelQueue.length) return;
+  channelIndex++;
+  if (channelIndex >= channelQueue.length){
+    channelQueue = shuffle(channelQueue);
+    channelIndex = 0;
+  }
+  loadChannelIndex(channelIndex, true);
+});
+
+function openModal(){ overlayEl.classList.add("open"); }
+function closeModal(){ overlayEl.classList.remove("open"); }
+
+btnMenu.addEventListener("click", openModal);
+btnClose.addEventListener("click", closeModal);
+overlayEl.addEventListener("click", (e) => { if (e.target === overlayEl) closeModal(); });
+
+btnSearch.addEventListener("click", () => {
+  searchWrap.classList.toggle("open");
+  if (searchWrap.classList.contains("open")){
+    searchInput.focus();
+  } else {
+    searchInput.value = "";
+    searchQuery = "";
+    if (mode === "channel") switchChannel(currentChannel, false);
+  }
+});
+
+searchInput.addEventListener("input", () => {
+  searchQuery = searchInput.value || "";
+  if (mode === "channel") switchChannel(currentChannel, false);
+});
+
+// Mode pills
+document.querySelectorAll("#modeRow .pill").forEach(p => {
+  p.addEventListener("click", () => {
+    const m = p.dataset.mode;
+    if (m === "channel"){
+      switchChannel(currentChannel, false);
+    } else {
+      enterShowMode();
+    }
+  });
+});
+
+// Visualizer pills (placeholder)
+document.querySelectorAll("#vizRow .pill").forEach(p => {
+  p.addEventListener("click", () => {
+    document.querySelectorAll("#vizRow .pill").forEach(x => x.classList.remove("active"));
+    p.classList.add("active");
+  });
+});
+
+/* =========================
+   BACKGROUND SELECTOR
+========================= */
+function clearBg(){
+  bgVideo.pause();
+  bgVideo.removeAttribute("src");
+  bgVideo.style.display = "none";
+  bgImage.removeAttribute("src");
+  bgImage.style.display = "none";
+  bgStars.style.display = "none";
+}
+
+async function setBg(spec){
+  clearBg();
+
+  if (spec === "none") return;
+  if (spec === "stars"){
+    bgStars.style.display = "block";
+    return;
+  }
+
+  // video:path or image:path
+  const [kind, path] = spec.split(":", 2);
+  if (!path) return;
+
+  if (kind === "video"){
+    bgVideo.src = path;
+    bgVideo.style.display = "block";
+    try { await bgVideo.play(); } catch(e) { /* autoplay may be blocked; still shows frame */ }
+    return;
+  }
+
+  if (kind === "image"){
+    bgImage.src = path;
+    bgImage.style.display = "block";
+    return;
+  }
+}
+
+bgRow.querySelectorAll(".pill").forEach(p => {
+  p.addEventListener("click", () => {
+    bgRow.querySelectorAll(".pill").forEach(x => x.classList.remove("active"));
+    p.classList.add("active");
+    setBg(p.dataset.bg);
+  });
+});
+
+/* =========================
+   VOLUME DOTS
+========================= */
+const VOL_STEPS = 10;
+function setVolume(v){
+  v = Math.max(0, Math.min(1, v));
+  audioEl.volume = v;
+  renderVolDots();
+}
+function renderVolDots(){
+  volDotsEl.innerHTML = "";
+  const onCount = Math.round(audioEl.volume * VOL_STEPS);
+  for (let i = 1; i <= VOL_STEPS; i++){
+    const dot = document.createElement("div");
+    dot.className = "dot" + (i <= onCount ? " on" : "");
+    volDotsEl.appendChild(dot);
+  }
+}
+volDown.addEventListener("click", () => setVolume(audioEl.volume - (1/VOL_STEPS)));
+volUp.addEventListener("click", () => setVolume(audioEl.volume + (1/VOL_STEPS)));
+
+/* =========================
+   RENDER DOCK + MODAL CHANNELS
 ========================= */
 function renderDock(){
   dockRowEl.innerHTML = "";
@@ -830,202 +1267,30 @@ function renderModalChannels(){
   });
 }
 
-function renderNowPlaying(track){
-  const channelLabel = `The ${currentChannel} Channel`;
-  channelNameEl.textContent = channelLabel;
-
-  if (!track){
-    trackTitleEl.textContent = "—";
-    metaLineEl.textContent = "—";
-    return;
-  }
-
-  trackTitleEl.textContent = titleOf(track);
-  const show = track.show || track.showTitle || "Unknown Show";
-  const len = formatTime(track.durationSeconds);
-  const extras = [];
-  extras.push(`Show: ${show}`);
-  if (len) extras.push(`Length: ${len}`);
-  metaLineEl.textContent = extras.join(" • ");
-}
-
-function renderSchedule(){
-  // Show next 10 items (after the current one)
-  scheduleListEl.innerHTML = "";
-
-  const queue = channelQueue;
-  if (!queue.length){
-    const li = document.createElement("li");
-    li.textContent = "No items found in this channel.";
-    scheduleListEl.appendChild(li);
-    return;
-  }
-
-  const items = [];
-  for (let i = 1; i <= 10; i++){
-    const idx = (channelIndex + i) % queue.length;
-    items.push(queue[idx]);
-  }
-
-  items.forEach((t, i) => {
-    const li = document.createElement("li");
-    const left = document.createElement("span");
-    left.textContent = `${i+1}. ${titleOf(t)}`;
-
-    const right = document.createElement("small");
-    right.textContent = t.show || t.showTitle || "";
-
-    li.appendChild(left);
-    li.appendChild(right);
-    scheduleListEl.appendChild(li);
-  });
-}
-
 /* =========================
-   PLAYBACK
-========================= */
-function buildChannelQueue(channel){
-  const base = allTracks
-    .map(t => ({...t, channel: inferredChannel(t)}))
-    .filter(t => t.channel === channel);
-
-  const searched = applySearch(base);
-  return shuffle(searched);
-}
-
-function loadIndex(i, autoplay){
-  if (!channelQueue.length) return;
-
-  channelIndex = Math.max(0, Math.min(i, channelQueue.length - 1));
-  const t = channelQueue[channelIndex];
-
-  audioEl.src = t.url;
-  renderNowPlaying(t);
-  renderSchedule();
-
-  statusHintEl.textContent = `Channel: ${currentChannel} • ${channelQueue.length} item(s) in rotation${searchQuery ? " • filtered" : ""}`;
-
-  if (autoplay){
-    audioEl.play().catch(() => {
-      // autoplay might be blocked; user can press play
-    });
-  }
-}
-
-function switchChannel(channel, autoplay){
-  currentChannel = channel;
-
-  channelQueue = buildChannelQueue(currentChannel);
-  channelIndex = 0;
-
-  setActiveDock();
-  renderNowPlaying(channelQueue[0] || null);
-  renderSchedule();
-
-  if (channelQueue.length){
-    audioEl.src = channelQueue[0].url;
-    if (autoplay) audioEl.play().catch(()=>{});
-  } else {
-    audioEl.removeAttribute("src");
-  }
-}
-
-audioEl.addEventListener("ended", () => {
-  if (!channelQueue.length) return;
-  channelIndex++;
-  if (channelIndex >= channelQueue.length){
-    channelQueue = shuffle(channelQueue);
-    channelIndex = 0;
-  }
-  loadIndex(channelIndex, true);
-});
-
-/* =========================
-   MODAL + SEARCH + VOLUME
-========================= */
-function openModal(){ overlayEl.classList.add("open"); }
-function closeModal(){ overlayEl.classList.remove("open"); }
-
-btnMenu.addEventListener("click", openModal);
-btnClose.addEventListener("click", closeModal);
-overlayEl.addEventListener("click", (e) => {
-  if (e.target === overlayEl) closeModal();
-});
-
-btnSearch.addEventListener("click", () => {
-  searchWrap.classList.toggle("open");
-  if (searchWrap.classList.contains("open")){
-    searchInput.focus();
-  } else {
-    searchInput.value = "";
-    searchQuery = "";
-    // rebuild current channel without filter
-    switchChannel(currentChannel, false);
-  }
-});
-
-searchInput.addEventListener("input", () => {
-  searchQuery = searchInput.value || "";
-  switchChannel(currentChannel, false);
-});
-
-document.querySelectorAll("#vizRow .pill").forEach(p => {
-  p.addEventListener("click", () => {
-    document.querySelectorAll("#vizRow .pill").forEach(x => x.classList.remove("active"));
-    p.classList.add("active");
-    // placeholder: wire later
-  });
-});
-
-// Volume dots (10 steps)
-const VOL_STEPS = 10;
-function setVolume(v){
-  v = Math.max(0, Math.min(1, v));
-  audioEl.volume = v;
-  renderVolDots();
-}
-function renderVolDots(){
-  volDotsEl.innerHTML = "";
-  const onCount = Math.round(audioEl.volume * VOL_STEPS);
-  for (let i = 1; i <= VOL_STEPS; i++){
-    const dot = document.createElement("div");
-    dot.className = "dot" + (i <= onCount ? " on" : "");
-    volDotsEl.appendChild(dot);
-  }
-}
-volDown.addEventListener("click", () => {
-  const step = 1 / VOL_STEPS;
-  setVolume(audioEl.volume - step);
-});
-volUp.addEventListener("click", () => {
-  const step = 1 / VOL_STEPS;
-  setVolume(audioEl.volume + step);
-});
-
-/* =========================
-   LOAD DATA
+   INIT
 ========================= */
 async function init(){
+  setModeUI();
   renderDock();
   renderModalChannels();
   setVolume(0.6);
+  setBg("none");
 
   try{
     const res = await fetch(DATA_URL, { cache: "no-store" });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-
-    // Your shows.json is an array of track objects (flat list)
     if (!Array.isArray(data)) throw new Error("shows.json must be a JSON array of tracks.");
 
     allTracks = data;
 
-    // Prime channel
+    // show picker list
+    renderShowSelect();
+
+    // start in channel mode (no autoplay)
     switchChannel(currentChannel, false);
     setActiveDock();
-
-    // If you want auto-start on first channel, change false -> true:
-    // switchChannel(currentChannel, true);
 
   }catch(err){
     trackTitleEl.textContent = "Couldn’t load shows.json";
