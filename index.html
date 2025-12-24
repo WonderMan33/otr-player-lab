@@ -9,12 +9,10 @@
     :root{
       --bg0:#070707;
       --bg1:#0d0d0d;
-      --glass: rgba(0,0,0,.38);
       --stroke: rgba(255,255,255,.12);
       --text: rgba(255,255,255,.92);
       --muted: rgba(255,255,255,.70);
       --gold: #f5c24b;
-      --gold2:#d7b24a;
     }
     *{ box-sizing:border-box; }
     body{
@@ -27,52 +25,29 @@
         linear-gradient(180deg, var(--bg0), var(--bg1));
       min-height:100vh;
     }
-    .wrap{
-      width:min(1100px, 94vw);
-      margin: 18px auto 30px;
-    }
+    .wrap{ width:min(1100px, 94vw); margin: 18px auto 30px; }
     header{
-      display:flex;
-      gap:14px;
-      align-items:center;
-      justify-content:space-between;
+      display:flex; gap:14px; align-items:center; justify-content:space-between;
       padding: 14px 16px;
       border: 1px solid var(--stroke);
       background: rgba(0,0,0,.22);
       border-radius: 18px;
       backdrop-filter: blur(8px);
     }
-    .brand{
-      display:flex; gap:12px; align-items:center;
-    }
+    .brand{ display:flex; gap:12px; align-items:center; }
     .logo{
-      width:40px;height:40px;border-radius:14px;
-      display:grid;place-items:center;
+      width:40px;height:40px;border-radius:14px; display:grid;place-items:center;
       background: radial-gradient(circle at 30% 20%, rgba(255,255,255,.22), rgba(0,0,0,.55));
       border:1px solid rgba(255,255,255,.14);
       box-shadow: 0 10px 30px rgba(0,0,0,.40);
       font-size:20px;
     }
-    .brand h1{
-      margin:0;
-      font-size: 16px;
-      letter-spacing:.6px;
-      font-weight: 700;
-    }
-    .brand .sub{
-      margin-top:2px;
-      font-size: 12px;
-      color: var(--muted);
-      letter-spacing:.4px;
-    }
+    .brand h1{ margin:0; font-size:16px; letter-spacing:.6px; font-weight:800; }
+    .brand .sub{ margin-top:2px; font-size:12px; color: var(--muted); letter-spacing:.4px; }
 
     /* Root mode pills */
     .modePills{
-      display:flex;
-      justify-content:center;
-      gap:14px;
-      margin: 14px auto 10px;
-      flex-wrap:wrap;
+      display:flex; justify-content:center; gap:14px; margin: 14px auto 10px; flex-wrap:wrap;
     }
     .pillBtn{
       padding: 12px 18px;
@@ -88,7 +63,7 @@
     }
     .pillBtn:hover{ border-color: rgba(245,194,75,.55); }
     .pillBtn.active{
-      border-color: rgba(245,194,75,.85);
+      border-color: rgba(245,194,75,.90);
       box-shadow: inset 0 1px 0 rgba(255,255,255,.10),
                   0 0 0 3px rgba(245,194,75,.12),
                   0 10px 30px rgba(0,0,0,.40);
@@ -103,16 +78,8 @@
       backdrop-filter: blur(8px);
       box-shadow: 0 18px 40px rgba(0,0,0,.35);
     }
-    .topRow{
-      display:flex;
-      gap:14px;
-      align-items:stretch;
-      flex-wrap:wrap;
-    }
-    .now{
-      flex: 1 1 420px;
-      min-width: 280px;
-    }
+    .topRow{ display:flex; gap:14px; align-items:stretch; flex-wrap:wrap; }
+    .now{ flex: 1 1 420px; min-width: 280px; }
     .viz{
       flex: 1.4 1 520px;
       min-width: 280px;
@@ -124,28 +91,14 @@
     }
     canvas{ display:block; width:100%; height: 360px; }
     .vizOverlay{
-      position:absolute; inset:0;
-      pointer-events:none;
-      background: radial-gradient(700px 250px at 50% 0%, rgba(245,194,75,.13), transparent 60%);
+      position:absolute; inset:0; pointer-events:none;
+      background: radial-gradient(900px 320px at 50% 0%, rgba(245,194,75,.13), transparent 60%);
     }
 
-    .titleLine{
-      font-weight: 800;
-      letter-spacing: .4px;
-      font-size: 14px;
-      margin: 2px 0 6px;
-    }
-    .metaLine{
-      font-size: 12px;
-      color: var(--muted);
-      margin: 0 0 12px;
-      min-height: 16px;
-    }
-    .playerRow{
-      display:flex;
-      align-items:flex-end;
-      gap:12px;
-    }
+    .titleLine{ font-weight: 900; letter-spacing: .4px; font-size: 14px; margin: 2px 0 6px; }
+    .metaLine{ font-size: 12px; color: var(--muted); margin: 0 0 12px; min-height: 16px; }
+
+    .playerRow{ display:flex; align-items:flex-end; gap:12px; }
     .controls{
       flex:1;
       border: 1px solid rgba(255,255,255,.10);
@@ -153,13 +106,7 @@
       padding: 12px;
       background: rgba(0,0,0,.18);
     }
-    .btnRow{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-bottom: 10px;
-    }
+    .btnRow{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom: 10px; }
     .btn{
       padding: 10px 14px;
       border-radius: 999px;
@@ -176,24 +123,13 @@
       border-color: rgba(245,194,75,.70);
       background: rgba(245,194,75,.12);
     }
-    .timeRow{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      font-size: 12px;
-      color: var(--muted);
-    }
-    .range{
-      width:100%;
-      accent-color: var(--gold);
-    }
+    .timeRow{ display:flex; align-items:center; gap:10px; font-size: 12px; color: var(--muted); }
+    .range{ width:100%; accent-color: var(--gold); }
 
     /* Vertical volume */
     .volRail{
       width: 52px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
+      display:flex; align-items:center; justify-content:center;
       padding: 8px 6px;
       border: 1px solid rgba(255,255,255,.10);
       border-radius: 18px;
@@ -208,13 +144,7 @@
     }
 
     /* Channel dock */
-    nav.dock{
-      margin-top: 12px;
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      justify-content:center;
-    }
+    nav.dock{ margin-top: 12px; display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
     .dockBtn{
       padding: 11px 14px;
       border-radius: 999px;
@@ -241,16 +171,10 @@
       background: rgba(0,0,0,.18);
       padding: 12px;
     }
-    .row{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      flex-wrap:wrap;
-      justify-content:center;
-    }
+    .row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:center; }
     select.select{
-      width: min(560px, 100%);
-      max-width: 560px;
+      width: min(520px, 100%);
+      max-width: 520px;
       padding: 10px 12px;
       border-radius: 12px;
       border: 1px solid rgba(255,255,255,.14);
@@ -258,12 +182,7 @@
       color: var(--text);
       font-size: 14px;
     }
-    .smallNote{
-      margin-top: 8px;
-      text-align:center;
-      font-size: 12px;
-      color: var(--muted);
-    }
+    .smallNote{ margin-top: 8px; text-align:center; font-size: 12px; color: var(--muted); }
     .episodeBox{
       margin-top: 10px;
       max-height: 340px;
@@ -283,7 +202,7 @@
     }
     .epRow:hover{ background: rgba(255,255,255,.03); }
     .epRow.active{ background: rgba(245,194,75,.10); }
-    .epTitle{ font-size: 13px; font-weight: 700; }
+    .epTitle{ font-size: 13px; font-weight: 800; }
     .epMeta{ font-size: 12px; color: var(--muted); white-space:nowrap; }
 
     /* Visualizer buttons */
@@ -309,14 +228,10 @@
       user-select:none;
     }
     .vizBtn.active{ border-color: rgba(245,194,75,.80); }
+    .vizBtn.fs{ border-color: rgba(245,194,75,.60); background: rgba(245,194,75,.12); }
 
-    footer{
-      margin-top: 14px;
-      text-align:center;
-      font-size: 12px;
-      color: var(--muted);
-    }
-  
+    footer{ margin-top: 14px; text-align:center; font-size: 12px; color: var(--muted); }
+
     /* Fullscreen overlay */
     .fsOverlay{
       position: fixed;
@@ -326,16 +241,11 @@
         radial-gradient(1200px 800px at 30% 10%, rgba(245,194,75,.18), transparent 60%),
         radial-gradient(1200px 800px at 80% 20%, rgba(255,255,255,.06), transparent 60%),
         linear-gradient(180deg, #050505, #0b0b0b);
+      display:none;
     }
-    .fsCanvasWrap{
-      position:absolute;
-      inset:0;
-    }
-    #fsCanvas{
-      width:100%;
-      height:100%;
-      display:block;
-    }
+    .fsCanvasWrap{ position:absolute; inset:0; }
+    #fsCanvas{ width:100%; height:100%; display:block; }
+
     .fsControls{
       position:absolute;
       left:0; right:0;
@@ -346,15 +256,12 @@
       backdrop-filter: blur(8px);
     }
     .fsTop{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
       margin-bottom: 10px;
     }
     .fsNow{
       font-size: 14px;
-      font-weight: 800;
+      font-weight: 900;
       letter-spacing: .5px;
       color: rgba(255,255,255,.92);
       overflow:hidden;
@@ -363,10 +270,7 @@
       max-width: 72vw;
     }
     .fsButtons{
-      display:flex;
-      gap:10px;
-      justify-content:center;
-      flex-wrap:wrap;
+      display:flex; gap:10px; justify-content:center; flex-wrap:wrap;
       margin-bottom: 10px;
     }
     .fsBtn{
@@ -400,33 +304,11 @@
       max-width: 1100px;
       margin: 0 auto;
     }
-    .fsTime{
-      font-size: 13px;
-      color: rgba(255,255,255,.78);
-      letter-spacing: .4px;
-    }
-    .fsVol{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      color: rgba(255,255,255,.78);
-      font-size: 13px;
-    }
-    .fsVolSlider{
-      width: 180px;
-      accent-color: var(--gold);
-    }
-    .fsVizStrip{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      justify-content:flex-end;
-    }
-    .fsVizBtn.active{
-      border-color: rgba(245,194,75,.85);
-      box-shadow: 0 0 0 3px rgba(245,194,75,.12);
-    }
-
+    .fsTime{ font-size: 13px; color: rgba(255,255,255,.78); letter-spacing: .4px; }
+    .fsVol{ display:flex; align-items:center; gap:8px; color: rgba(255,255,255,.78); font-size: 13px; }
+    .fsVolSlider{ width: 180px; accent-color: var(--gold); }
+    .fsVizStrip{ display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+    .fsVizBtn.active{ border-color: rgba(245,194,75,.85); box-shadow: 0 0 0 3px rgba(245,194,75,.12); }
   </style>
 </head>
 
@@ -440,10 +322,10 @@
           <div class="sub">hosted by Golden Radio Hour</div>
         </div>
       </div>
-      
+      <div style="font-size:12px;color:rgba(255,255,255,.70);"></div>
     </header>
 
-    <div class="modePills" id="modePills">
+    <div class="modePills">
       <button class="pillBtn active" id="pillListenChannel" type="button">Listen to Channel</button>
       <button class="pillBtn" id="pillListenShow" type="button">Listen by Show</button>
     </div>
@@ -481,16 +363,16 @@
         </div>
 
         <div class="viz">
-          <canvas id="vizCanvas" width="900" height="300"></canvas>
+          <canvas id="vizCanvas"></canvas>
           <div class="vizOverlay"></div>
 
           <div class="vizStrip" id="vizStrip">
-  <button class="vizBtn" id="vizFullscreenBtn" type="button">Fullscreen</button>
             <button class="vizBtn active" data-viz="none" type="button">Off</button>
             <button class="vizBtn" data-viz="wave" type="button">Wave</button>
             <button class="vizBtn" data-viz="bars" type="button">Bars</button>
             <button class="vizBtn" data-viz="ring" type="button">Ring</button>
             <button class="vizBtn" data-viz="particles" type="button">Particles</button>
+            <button class="vizBtn fs" id="vizFullscreenBtn" type="button">Fullscreen</button>
           </div>
         </div>
       </div>
@@ -507,13 +389,12 @@
     </div>
 
     <footer>
-      Tip: If you prefer browsing by program, tap <b>Listen by Show</b>. For easy “radio-style” listening, tap <b>Listen to Channel</b>.
+      Tip: Use <b>Listen by Show</b> to browse programs, or <b>Listen to Channel</b> for radio-style listening.
     </footer>
   </div>
 
-  
   <!-- Fullscreen Visualizer Overlay -->
-  <div id="fsOverlay" class="fsOverlay" style="display:none;" aria-hidden="true">
+  <div id="fsOverlay" class="fsOverlay" aria-hidden="true">
     <div class="fsCanvasWrap">
       <canvas id="fsCanvas"></canvas>
     </div>
@@ -535,13 +416,11 @@
 
       <div class="fsBottom">
         <div class="fsTime">
-          <span id="fsTCur">0:00</span>
-          <span> / </span>
-          <span id="fsTDur">0:00</span>
+          <span id="fsTCur">0:00</span><span> / </span><span id="fsTDur">0:00</span>
         </div>
 
         <div class="fsVol">
-          <span class="fsVolLabel">Vol</span>
+          <span>Vol</span>
           <input id="fsVol" class="fsVolSlider" type="range" min="0" max="1" step="0.01" value="0.6" aria-label="Volume" />
         </div>
 
@@ -556,7 +435,6 @@
     </div>
   </div>
 
-
   <audio id="audio" preload="none" crossorigin="anonymous"></audio>
 
   <script>
@@ -566,11 +444,8 @@
   function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
   function escapeHtml(str){
     return String(str ?? "")
-      .replace(/&/g,"&amp;")
-      .replace(/</g,"&lt;")
-      .replace(/>/g,"&gt;")
-      .replace(/"/g,"&quot;")
-      .replace(/'/g,"&#39;");
+      .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+      .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
   }
   function safeShow(el, on){
     if(!el) return;
@@ -605,121 +480,132 @@
   const volMain = document.getElementById("volMain");
 
   const audioEl = document.getElementById("audio");
-  
-  // Fullscreen elements (declared early to avoid TDZ)
-  var fsOverlay=null, fsCanvas=null, fsExitBtn=null, fsNow=null, fsPrev=null, fsPlay=null, fsNext=null, fsStop=null, fsSeek=null, fsTCur=null, fsTDur=null, fsVol=null, fsVizStrip=null;
-  var inFullscreen=false;
-
   audioEl.volume = Number(volMain.value || 0.6);
+
+  // Fullscreen elements declared early (no TDZ problems)
+  const fsOverlay = document.getElementById("fsOverlay");
+  const fsCanvas  = document.getElementById("fsCanvas");
+  const fsExitBtn = document.getElementById("fsExitBtn");
+  const fsNow     = document.getElementById("fsNow");
+  const fsPrev    = document.getElementById("fsPrev");
+  const fsPlay    = document.getElementById("fsPlay");
+  const fsNext    = document.getElementById("fsNext");
+  const fsStop    = document.getElementById("fsStop");
+  const fsSeek    = document.getElementById("fsSeek");
+  const fsTCur    = document.getElementById("fsTCur");
+  const fsTDur    = document.getElementById("fsTDur");
+  const fsVol     = document.getElementById("fsVol");
+  const fsVizStrip= document.getElementById("fsVizStrip");
+  const vizFullscreenBtn = document.getElementById("vizFullscreenBtn");
 
   // ---------- app state ----------
   let mode = "channel"; // "channel" | "show"
   let allTracks = [];
   let showIndex = new Map(); // showKey -> {name, tracks}
   let currentShowKey = null;
-  let currentQueue = [];     // playing queue in current mode
-  let currentIdx = -1;       // index within currentQueue
-  let currentKey = "";       // for episode highlight in show list
+  let currentQueue = [];
+  let currentIdx = -1;
 
-  // Channels are heuristic because your JSON currently has no tags.
+  // Visualizer state
+  const vizCanvas = document.getElementById("vizCanvas");
+  const vctx = vizCanvas.getContext("2d");
+  const vizStrip = document.getElementById("vizStrip");
+  let vizMode = "none";
+  let audioCtx = null;
+  let analyser = null;
+  let freqArr = null;
+  let timeArr = null;
+  let srcNode = null;
+  let particles = [];
+  let inFullscreen = false;
+
+  // Channels are heuristic (since JSON typically has show + title + url)
   const CHANNELS = [
-    { id:"detective", label:"Detective",  test: s => /detective|sleuth|noir|private|marlowe|falcon|regan|diamond|wolfe|dollar|drew|broadway|beat/i.test(s) },
+    { id:"detective", label:"Detective",  test: s => /detective|sleuth|noir|private|marlowe|falcon|regan|diamond|wolfe|dollar|broadway|beat/i.test(s) },
     { id:"mystery",   label:"Mystery",    test: s => /mystery|whistler|murder|case|investigation/i.test(s) },
     { id:"suspense",  label:"Suspense",   test: s => /suspense|terror|thriller/i.test(s) },
     { id:"horror",    label:"Horror",     test: s => /horror|haunt|ghost|vamp|demon|weird|night|dark/i.test(s) },
-    { id:"scifi",     label:"Sci‑Fi",     test: s => /x minus|x\-minus|science|space|planet|alien|robot|twilight|zone/i.test(s) },
+    { id:"scifi",     label:"Sci-Fi",     test: s => /x minus|x\-minus|science|space|planet|alien|robot|twilight|zone/i.test(s) },
     { id:"western",   label:"Western",    test: s => /gunsmoke|six shooter|ranger|west|cowboy|texas/i.test(s) },
     { id:"comedy",    label:"Comedy",     test: s => /comedy|molly|mcgee|jack benny|burns|allen|lucille|abbott|costello/i.test(s) },
     { id:"theater",   label:"Radio Theater", test: s => /radio mystery theater|cbs radio|playhouse|theater|theatre/i.test(s) },
     { id:"all",       label:"All",        test: _ => true },
   ];
-
   let currentChannelId = "detective";
 
-  // ---------- mode switching (ROOT PILLS) ----------
+  // ---------- mode switching ----------
   function setModeFromUI(newMode){
     mode = newMode;
     pillListenChannel.classList.toggle("active", mode === "channel");
     pillListenShow.classList.toggle("active", mode === "show");
     safeShow(dock, mode === "channel");
     safeShow(showPanel, mode === "show");
-    // Do NOT autoplay when switching into show mode.
     updateNowPlayingUI();
   }
-
   pillListenChannel.addEventListener("click", () => setModeFromUI("channel"));
   pillListenShow.addEventListener("click", () => setModeFromUI("show"));
 
-  // ---------- build indexes ----------
-  function normShowName(t){
+  // ---------- indexing ----------
+  function showNameOf(t){
     return (t.showTitle || t.show || "").trim();
+  }
+  function showKeyOf(t){
+    return (t.show || showNameOf(t) || "unknown").toLowerCase().trim();
   }
   function buildShowIndex(){
     showIndex = new Map();
     for(const t of allTracks){
-      const key = (t.show || normShowName(t)).toLowerCase();
+      const key = showKeyOf(t);
       if(!showIndex.has(key)){
-        showIndex.set(key, { key, name: normShowName(t) || t.show || "Unknown", tracks: [] });
+        showIndex.set(key, { key, name: showNameOf(t) || t.show || "Unknown", tracks: [] });
       }
       showIndex.get(key).tracks.push(t);
     }
-    // Optional sort for stability
     for(const v of showIndex.values()){
       v.tracks.sort((a,b) => String(a.displayTitle||a.title||"").localeCompare(String(b.displayTitle||b.title||"")));
     }
   }
-
   function populateShowSelect(){
     const items = Array.from(showIndex.values())
-      .sort((a,b) => a.name.localeCompare(b.name))
-      .map(v => ({ value: v.key, label: v.name }));
-
-    showSelectInline.innerHTML = `<option value="__all__">Select a show…</option>` +
-      items.map(it => `<option value="${escapeHtml(it.value)}">${escapeHtml(it.label)}</option>`).join("");
+      .sort((a,b) => a.name.localeCompare(b.name));
+    showSelectInline.innerHTML =
+      `<option value="__all__">Select a show…</option>` +
+      items.map(v => `<option value="${escapeHtml(v.key)}">${escapeHtml(v.name)}</option>`).join("");
   }
 
-  // ---------- channels ----------
+  // ---------- channel queues ----------
   function buildChannelQueue(channelId){
     const ch = CHANNELS.find(x => x.id === channelId) || CHANNELS[CHANNELS.length-1];
-    // Choose representative text for classification
-    const tracks = allTracks.filter(t => ch.test(`${normShowName(t)} ${t.title||""}`));
-    // Shuffle lightly (Fisher-Yates)
-    const arr = tracks.slice();
+    const arr = allTracks.filter(t => ch.test(`${showNameOf(t)} ${t.title||""}`)).slice();
     for(let i=arr.length-1;i>0;i--){
       const j = Math.floor(Math.random()*(i+1));
       [arr[i],arr[j]] = [arr[j],arr[i]];
     }
     return arr;
   }
-
   function renderDock(){
     dock.innerHTML = "";
-    for(const ch of CHANNELS){
-      if(ch.id === "all") continue; // keep All but place at end visually
-    }
     const ordered = [...CHANNELS.filter(c=>c.id!=="all"), CHANNELS.find(c=>c.id==="all")].filter(Boolean);
-
-    ordered.forEach(ch => {
+    for(const ch of ordered){
       const b = document.createElement("button");
-      b.type = "button";
-      b.className = "dockBtn" + (ch.id === currentChannelId ? " active" : "");
+      b.type="button";
+      b.className = "dockBtn" + (ch.id===currentChannelId ? " active" : "");
       b.textContent = ch.label;
       b.addEventListener("click", () => {
         currentChannelId = ch.id;
-        Array.from(dock.querySelectorAll(".dockBtn")).forEach(x => x.classList.remove("active"));
+        dock.querySelectorAll(".dockBtn").forEach(x => x.classList.remove("active"));
         b.classList.add("active");
 
-        // Switch to channel mode and start playing immediately (radio behavior)
         setModeFromUI("channel");
         currentQueue = buildChannelQueue(currentChannelId);
         currentIdx = 0;
         playIndex(currentIdx, true);
       });
       dock.appendChild(b);
-    });
+    }
   }
 
-  // ---------- show mode rendering ----------
+  // ---------- show mode ----------
   function renderEpisodes(){
     episodeBox.innerHTML = "";
     if(!currentShowKey){
@@ -732,70 +618,59 @@
       return;
     }
     group.tracks.forEach((t, idx) => {
-      const key = `show|${currentShowKey}|${idx}`;
       const row = document.createElement("div");
-      row.className = "epRow" + (key === currentKey ? " active" : "");
+      row.className = "epRow" + (idx===currentIdx ? " active" : "");
       row.innerHTML = `<div class="epTitle">${escapeHtml(t.displayTitle || t.title || "Untitled")}</div>
                        <div class="epMeta">${t.durationSeconds ? escapeHtml(fmtTime(t.durationSeconds)) : ""}</div>`;
       row.addEventListener("click", () => {
         currentQueue = group.tracks;
         currentIdx = idx;
-        currentKey = key;
-        highlightEpisode();
+        episodeBox.querySelectorAll(".epRow").forEach((r,i)=>r.classList.toggle("active", i===currentIdx));
         playIndex(currentIdx, true);
       });
       episodeBox.appendChild(row);
     });
   }
 
-  function highlightEpisode(){
-    episodeBox.querySelectorAll(".epRow").forEach(r => r.classList.remove("active"));
-    const match = episodeBox.querySelector(`.epRow[data-key="${CSS.escape(currentKey)}"]`);
-    if(match) match.classList.add("active");
-  }
-
   showSelectInline.addEventListener("change", () => {
     const v = showSelectInline.value;
-    if(!v || v === "__all__"){
+    if(!v || v==="__all__"){
       currentShowKey = null;
       currentQueue = [];
       currentIdx = -1;
-      currentKey = "";
       renderEpisodes();
       updateNowPlayingUI();
       return;
     }
     currentShowKey = v;
-    // Show mode should be visible; no autoplay until selection (but selecting a show is the user action)
     setModeFromUI("show");
     currentQueue = showIndex.get(currentShowKey)?.tracks || [];
-    currentIdx = -1; // do not start until user clicks an episode OR presses Play
-    currentKey = "";
+    currentIdx = -1; // do not autoplay until user clicks episode or presses Play
     renderEpisodes();
     updateNowPlayingUI();
   });
 
-  // ---------- audio control ----------
+  // ---------- player ----------
   let userSeeking = false;
 
   function setPlayButton(isPlaying){
     btnPlay.textContent = isPlaying ? "Pause" : "Play";
-    if(typeof fsPlay !== "undefined" && fsPlay) fsPlay.textContent = isPlaying ? "Pause" : "Play";
+    if(fsPlay) fsPlay.textContent = isPlaying ? "Pause" : "Play";
   }
 
   function updateNowPlayingUI(){
-    if(mode === "channel"){
+    if(mode==="channel"){
       const name = (CHANNELS.find(c=>c.id===currentChannelId)?.label) || "Channel";
-      nowTitle.textContent = currentQueue[currentIdx]?.displayTitle || currentQueue[currentIdx]?.title || `Channel: ${name}`;
+      const t = currentQueue[currentIdx];
+      nowTitle.textContent = t ? (t.displayTitle || t.title || `Channel: ${name}`) : "Ready.";
       nowMeta.textContent = `Channel: ${name}`;
-      if(typeof fsNow !== "undefined" && fsNow) fsNow.textContent = nowTitle.textContent;
     }else{
       const showName = currentShowKey ? (showIndex.get(currentShowKey)?.name || "Show") : "Show";
       const t = currentQueue[currentIdx];
       nowTitle.textContent = t ? (t.displayTitle || t.title || "Untitled") : `Show: ${showName}`;
       nowMeta.textContent = `Show mode: ${showName}`;
-      if(typeof fsNow !== "undefined" && fsNow) fsNow.textContent = nowTitle.textContent;
     }
+    if(fsNow) fsNow.textContent = nowTitle.textContent || "Now Playing";
   }
 
   function loadTrack(t){
@@ -810,19 +685,15 @@
   }
 
   async function playIndex(idx, autoplay){
-    idx = clamp(idx, 0, Math.max(0, currentQueue.length-1));
+    if(!currentQueue.length) return;
+    idx = clamp(idx, 0, currentQueue.length-1);
     currentIdx = idx;
-    const t = currentQueue[currentIdx];
-    loadTrack(t);
+    loadTrack(currentQueue[currentIdx]);
 
-    if(mode === "show" && currentShowKey){
-      currentKey = `show|${currentShowKey}|${currentIdx}`;
-      // highlight
-      episodeBox.querySelectorAll(".epRow").forEach((r,i) => {
-        const on = i === currentIdx;
-        r.classList.toggle("active", on);
-        if(on) r.scrollIntoView({block:"nearest"});
-      });
+    if(mode==="show"){
+      episodeBox.querySelectorAll(".epRow").forEach((r,i)=>r.classList.toggle("active", i===currentIdx));
+      const active = episodeBox.querySelectorAll(".epRow")[currentIdx];
+      if(active) active.scrollIntoView({block:"nearest"});
     }
 
     if(autoplay){
@@ -830,7 +701,6 @@
         await audioEl.play();
         setPlayButton(true);
       }catch(e){
-        // autoplay blocked; keep button as Play
         setPlayButton(false);
       }
     }else{
@@ -846,24 +716,20 @@
 
   btnPlay.addEventListener("click", async () => {
     if(!audioEl.src){
-      // If in channel mode with no queue started yet, start at current channel
-      if(mode === "channel"){
+      if(mode==="channel"){
         currentQueue = buildChannelQueue(currentChannelId);
         currentIdx = 0;
         await playIndex(currentIdx, true);
         return;
       }
-      // In show mode: require a show selected + either an episode click or start from first
-      if(mode === "show" && currentShowKey){
+      if(mode==="show" && currentShowKey){
         currentQueue = showIndex.get(currentShowKey)?.tracks || [];
         if(!currentQueue.length) return;
         if(currentIdx < 0) currentIdx = 0;
         await playIndex(currentIdx, true);
-        return;
       }
       return;
     }
-
     if(audioEl.paused){
       try{ await audioEl.play(); setPlayButton(true); }catch(e){ setPlayButton(false); }
     }else{
@@ -874,46 +740,52 @@
 
   btnPrev.addEventListener("click", () => {
     if(!currentQueue.length) return;
-    const next = (currentIdx <= 0) ? 0 : currentIdx - 1;
-    playIndex(next, true);
+    playIndex(Math.max(0, currentIdx-1), true);
   });
-
   btnNext.addEventListener("click", () => {
     if(!currentQueue.length) return;
-    const next = (currentIdx >= currentQueue.length-1) ? currentQueue.length-1 : currentIdx + 1;
-    playIndex(next, true);
+    playIndex(Math.min(currentQueue.length-1, currentIdx+1), true);
   });
-
   btnStop.addEventListener("click", stopPlayback);
+
+  // mirror fullscreen buttons
+  fsPrev && fsPrev.addEventListener("click", ()=>btnPrev.click());
+  fsNext && fsNext.addEventListener("click", ()=>btnNext.click());
+  fsStop && fsStop.addEventListener("click", ()=>btnStop.click());
+  fsPlay && fsPlay.addEventListener("click", ()=>btnPlay.click());
 
   volMain.addEventListener("input", () => {
     audioEl.volume = Number(volMain.value);
-    if(typeof fsVol !== "undefined" && fsVol) fsVol.value = String(audioEl.volume);
+    if(fsVol) fsVol.value = String(audioEl.volume);
+  });
+  fsVol && fsVol.addEventListener("input", () => {
+    audioEl.volume = Number(fsVol.value);
+    volMain.value = fsVol.value;
   });
 
   audioEl.addEventListener("ended", () => {
-    // Auto-advance
     if(!currentQueue.length) return;
-    if(currentIdx < currentQueue.length-1){
-      playIndex(currentIdx+1, true);
-    }else{
-      setPlayButton(false);
-    }
+    if(currentIdx < currentQueue.length-1) playIndex(currentIdx+1, true);
+    else setPlayButton(false);
   });
 
   audioEl.addEventListener("timeupdate", () => {
     if(userSeeking) return;
     const dur = audioEl.duration || 0;
     const cur = audioEl.currentTime || 0;
+
     tCur.textContent = fmtTime(cur);
     tDur.textContent = fmtTime(dur);
-    if(typeof fsTCur !== "undefined"){ fsTCur.textContent = fmtTime(cur); fsTDur.textContent = fmtTime(dur); }
+    if(fsTCur) fsTCur.textContent = fmtTime(cur);
+    if(fsTDur) fsTDur.textContent = fmtTime(dur);
+
     if(dur > 0){
-      seek.value = String(Math.floor((cur/dur)*1000));
-      if(typeof fsSeek !== "undefined") fsSeek.value = seek.value;
+      const v = String(Math.floor((cur/dur)*1000));
+      seek.value = v;
+      if(fsSeek) fsSeek.value = v;
     }else{
       seek.value = "0";
-      if(typeof fsSeek !== "undefined") fsSeek.value = "0";
+      if(fsSeek) fsSeek.value = "0";
     }
   });
 
@@ -926,60 +798,199 @@
     }
     userSeeking = false;
   });
-  // ---------- fullscreen visualizer (canvas fills screen + controls overlay) ----------
-  const vizBox = document.querySelector(".viz");
-  const vizFullscreenBtn = document.getElementById("vizFullscreenBtn");
 
-  fsOverlay = document.getElementById("fsOverlay");
-  fsCanvas = document.getElementById("fsCanvas");
-  fsExitBtn = document.getElementById("fsExitBtn");
-  fsNow = document.getElementById("fsNow");
-  fsPrev = document.getElementById("fsPrev");
-  fsPlay = document.getElementById("fsPlay");
-  fsNext = document.getElementById("fsNext");
-  fsStop = document.getElementById("fsStop");
-  fsSeek = document.getElementById("fsSeek");
-  fsTCur = document.getElementById("fsTCur");
-  fsTDur = document.getElementById("fsTDur");
-  fsVol = document.getElementById("fsVol");
-  fsVizStrip = document.getElementById("fsVizStrip");
-  function showFs(on){
-    if(!fsOverlay) return;
-    fsOverlay.style.display = on ? "block" : "none";
-    fsOverlay.setAttribute("aria-hidden", on ? "false" : "true");
-    inFullscreen = on;
-    resizeCanvas();
-    resizeFsCanvas();
+  fsSeek && fsSeek.addEventListener("input", () => { userSeeking = true; });
+  fsSeek && fsSeek.addEventListener("change", () => {
+    const dur = audioEl.duration || 0;
+    if(dur > 0){
+      const pct = Number(fsSeek.value)/1000;
+      audioEl.currentTime = dur * pct;
+    }
+    userSeeking = false;
+  });
+
+  // ---------- visualizer ----------
+  function ensureAudioGraph(){
+    if(audioCtx) return;
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 2048;
+    freqArr = new Uint8Array(analyser.frequencyBinCount);
+    timeArr = new Uint8Array(analyser.fftSize);
+    srcNode = audioCtx.createMediaElementSource(audioEl);
+    srcNode.connect(analyser);
+    analyser.connect(audioCtx.destination);
   }
 
-  function resizeFsCanvas(){
-    const rect = fsCanvas.getBoundingClientRect();
+  function setVisualizer(modeName){ vizMode = modeName; }
+
+  vizStrip.querySelectorAll("[data-viz]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      vizStrip.querySelectorAll("[data-viz]").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      setVisualizer(btn.getAttribute("data-viz"));
+      // keep fullscreen strip synced
+      if(fsVizStrip){
+        fsVizStrip.querySelectorAll("[data-viz]").forEach(b=>{
+          b.classList.toggle("active", b.getAttribute("data-viz") === vizMode);
+        });
+      }
+    });
+  });
+
+  fsVizStrip && fsVizStrip.querySelectorAll("[data-viz]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      fsVizStrip.querySelectorAll("[data-viz]").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      setVisualizer(btn.getAttribute("data-viz"));
+      // keep main strip synced
+      vizStrip.querySelectorAll("[data-viz]").forEach(b=>{
+        b.classList.toggle("active", b.getAttribute("data-viz") === vizMode);
+      });
+    });
+  });
+
+  function resizeCanvas(canvasEl, ctx){
+    if(!canvasEl || !ctx) return;
+    const rect = canvasEl.getBoundingClientRect();
     const dpr = Math.min(2, window.devicePixelRatio || 1);
-    fsCanvas.width = Math.floor(rect.width * dpr);
-    fsCanvas.height = Math.floor(rect.height * dpr);
-    const fsCtx = fsCanvas.getContext("2d");
-    fsCtx.setTransform(dpr,0,0,dpr,0,0);
+    canvasEl.width = Math.floor(rect.width * dpr);
+    canvasEl.height = Math.floor(rect.height * dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+
+  function drawTo(canvasEl, ctx){
+    const rect = canvasEl.getBoundingClientRect();
+    const w = rect.width;
+    const h = rect.height;
+
+    ctx.clearRect(0,0,w,h);
+    ctx.fillStyle = "rgba(0,0,0,.10)";
+    ctx.fillRect(0,0,w,h);
+
+    if(vizMode === "none") return;
+
+    ensureAudioGraph();
+    if(audioCtx && audioCtx.state==="suspended" && !audioEl.paused){
+      audioCtx.resume().catch(()=>{});
+    }
+
+    analyser.getByteFrequencyData(freqArr);
+
+    if(vizMode === "bars"){
+      const bars = 72;
+      const step = Math.max(1, Math.floor(freqArr.length / bars));
+      const bw = w / bars;
+      for(let i=0;i<bars;i++){
+        const v = freqArr[i*step] / 255;
+        const bh = v * (h*0.80);
+        ctx.fillStyle = `rgba(245,194,75,${0.15 + v*0.75})`;
+        ctx.fillRect(i*bw, h-bh, bw*0.70, bh);
+      }
+    }
+
+    if(vizMode === "wave"){
+      analyser.getByteTimeDomainData(timeArr);
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "rgba(245,194,75,.85)";
+      ctx.beginPath();
+      for(let i=0;i<timeArr.length;i++){
+        const x = (i/(timeArr.length-1))*w;
+        const y = (timeArr[i]/255)*h;
+        if(i===0) ctx.moveTo(x,y);
+        else ctx.lineTo(x,y);
+      }
+      ctx.stroke();
+    }
+
+    if(vizMode === "ring"){
+      const cx=w/2, cy=h/2;
+      const radius = Math.min(w,h)*0.22;
+      const points = 140;
+      ctx.beginPath();
+      for(let i=0;i<points;i++){
+        const idx = Math.floor(i*(freqArr.length/points));
+        const amp = (freqArr[idx]/255) * (Math.min(w,h)*0.12);
+        const a = (i/points) * Math.PI*2;
+        const r = radius + amp;
+        const x = cx + Math.cos(a)*r;
+        const y = cy + Math.sin(a)*r;
+        if(i===0) ctx.moveTo(x,y);
+        else ctx.lineTo(x,y);
+      }
+      ctx.closePath();
+      ctx.strokeStyle="rgba(245,194,75,.85)";
+      ctx.lineWidth=2;
+      ctx.stroke();
+      ctx.fillStyle="rgba(245,194,75,.10)";
+      ctx.fill();
+    }
+
+    if(vizMode === "particles"){
+      if(particles.length < 110){
+        particles = Array.from({length:110}, () => ({
+          x: Math.random()*w, y: Math.random()*h,
+          vx:(Math.random()-.5)*0.7, vy:(Math.random()-.5)*0.7,
+          r: 1 + Math.random()*2.2
+        }));
+      }
+      const energy = freqArr.reduce((a,b)=>a+b,0) / (freqArr.length*255);
+      for(const p of particles){
+        p.x += p.vx*(1+energy*2.4);
+        p.y += p.vy*(1+energy*2.4);
+        if(p.x<0) p.x=w; if(p.x>w) p.x=0;
+        if(p.y<0) p.y=h; if(p.y>h) p.y=0;
+        ctx.beginPath();
+        ctx.fillStyle = `rgba(245,194,75,${0.10 + energy*0.75})`;
+        ctx.arc(p.x,p.y,p.r*(1+energy*1.7),0,Math.PI*2);
+        ctx.fill();
+      }
+    }
+  }
+
+  function drawLoop(){
+    requestAnimationFrame(drawLoop);
+
+    if(vctx){
+      drawTo(vizCanvas, vctx);
+    }
+    if(inFullscreen){
+      const fsCtx = fsCanvas.getContext("2d");
+      drawTo(fsCanvas, fsCtx);
+    }
   }
 
   window.addEventListener("resize", () => {
-    if(inFullscreen) resizeFsCanvas();
+    resizeCanvas(vizCanvas, vctx);
+    if(inFullscreen){
+      const fsCtx = fsCanvas.getContext("2d");
+      resizeCanvas(fsCanvas, fsCtx);
+    }
   });
 
-  vizFullscreenBtn?.addEventListener("click", async () => {
+  // ---------- fullscreen ----------
+  function showFs(on){
+    inFullscreen = on;
+    fsOverlay.style.display = on ? "block" : "none";
+    fsOverlay.setAttribute("aria-hidden", on ? "false" : "true");
+    if(fsNow) fsNow.textContent = nowTitle.textContent || "Now Playing";
+    if(fsVol) fsVol.value = String(audioEl.volume);
+    // resize fullscreen canvas now
+    const fsCtx = fsCanvas.getContext("2d");
+    resizeCanvas(fsCanvas, fsCtx);
+  }
+
+  vizFullscreenBtn.addEventListener("click", async () => {
     try{
-      if (!document.fullscreenElement) {
-        showFs(true);
-        await fsOverlay.requestFullscreen();
-      } else {
-        await document.exitFullscreen();
-      }
+      showFs(true);
+      await fsOverlay.requestFullscreen();
     }catch(e){
       console.error("Fullscreen failed:", e);
       showFs(false);
     }
   });
 
-  fsExitBtn?.addEventListener("click", async () => {
+  fsExitBtn.addEventListener("click", async () => {
     try{
       if(document.fullscreenElement) await document.exitFullscreen();
       else showFs(false);
@@ -990,220 +1001,17 @@
   });
 
   document.addEventListener("fullscreenchange", () => {
-    const on = !!document.fullscreenElement;
-    showFs(on);
-  });
-
-  // Mirror main controls into fullscreen overlay
-  function syncFsButtons(){
-    fsPlay.textContent = audioEl.paused ? "Play" : "Pause";
-    fsVol.value = String(audioEl.volume);
-  }
-
-  function syncFsNow(){
-    // Copy main now-playing line
-    fsNow.textContent = nowTitle.textContent || "Now Playing";
-  }
-
-  fsPrev?.addEventListener("click", () => btnPrev.click());
-  fsNext?.addEventListener("click", () => btnNext.click());
-  fsStop?.addEventListener("click", () => btnStop.click());
-  fsPlay?.addEventListener("click", () => btnPlay.click());
-
-  fsVol?.addEventListener("input", () => {
-    audioEl.volume = Number(fsVol.value);
-    volMain.value = fsVol.value;
-  });
-
-  fsSeek?.addEventListener("input", () => { userSeeking = true; });
-  fsSeek?.addEventListener("change", () => {
-    const dur = audioEl.duration || 0;
-    if(dur > 0){
-      const pct = Number(fsSeek.value)/1000;
-      audioEl.currentTime = dur * pct;
+    if(!document.fullscreenElement){
+      showFs(false);
+    }else{
+      showFs(true);
     }
-    userSeeking = false;
-  });
-
-  fsVizStrip?.querySelectorAll("[data-viz]")?.forEach(btn => {
-    btn.addEventListener("click", () => {
-      fsVizStrip.querySelectorAll("[data-viz]").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      const v = btn.getAttribute("data-viz");
-      // keep both strips in sync
-      vizStrip.querySelectorAll("[data-viz]").forEach(b => b.classList.toggle("active", b.getAttribute("data-viz") === v));
-      setVisualizer(v);
-    });
-  });
-  });
-
-
-  // ---------- visualizer ----------
-  const vizCanvas = document.getElementById("vizCanvas");
-  const vctx = vizCanvas.getContext("2d");
-  const vizStrip = document.getElementById("vizStrip");
-  let vizMode = "none";
-  let audioCtx = null;
-  let analyser = null;
-  let dataArr = null;
-  let srcNode = null;
-  let particles = [];
-
-  function resizeCanvas(){
-    // match CSS size while keeping internal resolution high enough
-    const rect = vizCanvas.getBoundingClientRect();
-    const dpr = Math.min(2, window.devicePixelRatio || 1);
-    vizCanvas.width = Math.floor(rect.width * dpr);
-    vizCanvas.height = Math.floor(rect.height * dpr);
-    vctx.setTransform(dpr,0,0,dpr,0,0);
-  }
-  window.addEventListener("resize", resizeCanvas);
-
-  function ensureAudioGraph(){
-    if(audioCtx) return;
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    analyser = audioCtx.createAnalyser();
-    analyser.fftSize = 2048;
-    dataArr = new Uint8Array(analyser.frequencyBinCount);
-    srcNode = audioCtx.createMediaElementSource(audioEl);
-    srcNode.connect(analyser);
-    analyser.connect(audioCtx.destination);
-  }
-
-  function setVisualizer(modeName){
-    vizMode = modeName;
-  }
-
-  vizStrip.querySelectorAll("[data-viz]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      vizStrip.querySelectorAll("[data-viz]").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      setVisualizer(btn.getAttribute("data-viz"));
-    });
-  });
-
-  function draw(){
-    requestAnimationFrame(draw);
-
-    // draw to normal canvas
-    drawTo(vizCanvas, vctx);
-
-    // draw to fullscreen canvas if active
-    if(typeof inFullscreen !== "undefined" && inFullscreen){
-      if(fsCanvas){
-      const fsCtx = fsCanvas.getContext("2d");
-      drawTo(fsCanvas, fsCtx);
-    }
-    }
-  }
-
-  function drawTo(canvasEl, ctx){
-    if(!ctx || !canvasEl) return;
-    const rect = canvasEl.getBoundingClientRect();
-    const w = rect.width;
-    const h = rect.height;
-
-    ctx.clearRect(0,0,w,h);
-
-    // background
-    ctx.fillStyle = "rgba(0,0,0,.10)";
-    ctx.fillRect(0,0,w,h);
-
-    if(vizMode === "none") return;
-
-    ensureAudioGraph();
-    if(audioCtx && audioCtx.state === "suspended" && !audioEl.paused){
-      audioCtx.resume().catch(()=>{});
-    }
-
-    analyser.getByteFrequencyData(dataArr);
-
-    if(vizMode === "bars"){
-      const bars = 72;
-      const step = Math.floor(dataArr.length / bars);
-      const bw = w / bars;
-      for(let i=0;i<bars;i++){
-        const v = dataArr[i*step] / 255;
-        const bh = v * (h*0.80);
-        ctx.fillStyle = `rgba(245,194,75,${0.15 + v*0.75})`;
-        ctx.fillRect(i*bw, h-bh, bw*0.70, bh);
-      }
-    }
-
-    if(vizMode === "wave"){
-      analyser.getByteTimeDomainData(dataArr);
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = "rgba(245,194,75,.85)";
-      ctx.beginPath();
-      for(let i=0;i<dataArr.length;i++){
-        const x = (i/(dataArr.length-1))*w;
-        const y = (dataArr[i]/255)*h;
-        if(i===0) ctx.moveTo(x,y);
-        else ctx.lineTo(x,y);
-      }
-      ctx.stroke();
-    }
-
-    if(vizMode === "ring"){
-      const cx = w/2, cy = h/2;
-      const radius = Math.min(w,h)*0.22;
-      const points = 140;
-      ctx.beginPath();
-      for(let i=0;i<points;i++){
-        const idx = Math.floor(i*(dataArr.length/points));
-        const amp = (dataArr[idx]/255) * (Math.min(w,h)*0.12);
-        const a = (i/points) * Math.PI*2;
-        const r = radius + amp;
-        const x = cx + Math.cos(a)*r;
-        const y = cy + Math.sin(a)*r;
-        if(i===0) ctx.moveTo(x,y);
-        else ctx.lineTo(x,y);
-      }
-      ctx.closePath();
-      ctx.strokeStyle = "rgba(245,194,75,.85)";
-      ctx.lineWidth = 2;
-      ctx.stroke();
-      ctx.fillStyle = "rgba(245,194,75,.10)";
-      ctx.fill();
-    }
-
-    if(vizMode === "particles"){
-      if(particles.length < 110){
-        particles = Array.from({length:110}, () => ({
-          x: Math.random()*w,
-          y: Math.random()*h,
-          vx: (Math.random()-.5)*0.7,
-          vy: (Math.random()-.5)*0.7,
-          r: 1 + Math.random()*2.2
-        }));
-      }
-      const energy = dataArr.reduce((a,b)=>a+b,0) / (dataArr.length*255);
-      for(const p of particles){
-        p.x += p.vx*(1+energy*2.4);
-        p.y += p.vy*(1+energy*2.4);
-        if(p.x<0) p.x=w;
-        if(p.x>w) p.x=0;
-        if(p.y<0) p.y=h;
-        if(p.y>h) p.y=0;
-        ctx.beginPath();
-        ctx.fillStyle = `rgba(245,194,75,${0.10 + energy*0.75})`;
-        ctx.arc(p.x,p.y,p.r*(1+energy*1.7),0,Math.PI*2);
-        ctx.fill();
-      }
-    }
-  }
-
-  // Start draw loop after layout paint
-  window.addEventListener("load", () => {
-    resizeCanvas();
-    requestAnimationFrame(draw);
   });
 
   // ---------- load JSON ----------
   async function loadShowsJson(){
     const url = "./shows.json";
-    console.log("Trying JSON:", url);
-    const res = await fetch(url, { cache: "no-store" });
+    const res = await fetch(url, { cache:"no-store" });
     if(!res.ok) throw new Error("Failed to load shows.json: " + res.status);
     const json = await res.json();
     if(!Array.isArray(json)) throw new Error("shows.json is not an array");
@@ -1211,24 +1019,28 @@
   }
 
   async function init(){
-    // default UI
     setModeFromUI("channel");
 
-    // load tracks
     allTracks = await loadShowsJson();
-    console.log("Loaded tracks:", allTracks.length);
 
     buildShowIndex();
     populateShowSelect();
     renderDock();
 
-    // Prime channel queue but don't autoplay until user presses Play or taps a channel
+    // Prime channel queue (no autoplay)
     currentQueue = buildChannelQueue(currentChannelId);
     currentIdx = -1;
+
     nowTitle.textContent = "Ready.";
     nowMeta.textContent = "Pick a channel, or switch to Show mode to browse programs.";
     tCur.textContent = "0:00";
     tDur.textContent = "0:00";
+
+    // canvas sizes
+    resizeCanvas(vizCanvas, vctx);
+    const fsCtx = fsCanvas.getContext("2d");
+    resizeCanvas(fsCanvas, fsCtx);
+    requestAnimationFrame(drawLoop);
   }
 
   init().catch(err => {
