@@ -1052,7 +1052,7 @@ function setModeUI(){
   if (active) active.classList.add("active");
 
   channelSection.style.display = (mode === "channel") ? "" : "none";
-  showSection.style.display = "none";
+  safeShow(showSection, false);
 
   // Browse panel under channels
   if (browsePanel) browsePanel.classList.toggle("open", mode === "show");
