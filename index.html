@@ -643,53 +643,63 @@ body.compact .playerBar{ padding: 8px 0 0; }
   gap:12px;
 }
 .volRail{
-  width: 48px;
+  width: 52px;
   display:flex;
   align-items:center;
   justify-content:center;
-  padding: 6px 0 0;
+  padding-top: 6px;
 }
 .volMain{
-  height: 140px;
+  height: 150px;
   width: 28px;
-  writing-mode: bt-lr;          /* Firefox */
-  -webkit-appearance: slider-vertical; /* WebKit */
+  writing-mode: bt-lr;
+  -webkit-appearance: slider-vertical;
 }
-body.compact .volMain{ height: 110px; }
+body.compact .volMain{ height: 120px; }
 
 
-.modeStrip{
+.mainControls{
   display:flex;
   gap:10px;
   flex-wrap:wrap;
-  margin: 12px 0 0;
+  margin-top: 12px;
 }
 .modeBtn{
-  padding: 10px 14px;
+  padding: 12px 16px;
   border-radius: 999px;
   border: 1px solid rgba(255,255,255,.14);
   background: rgba(0,0,0,.22);
   color: rgba(255,255,255,.92);
   cursor:pointer;
   font-size: 14px;
-  letter-spacing: .6px;
+  letter-spacing: .8px;
 }
 .modeBtn:hover{ border-color: rgba(245,194,75,.55); }
 .modeBtn.active{
-  border-color: rgba(245,194,75,.75);
-  box-shadow: 0 0 0 2px rgba(245,194,75,.15);
+  border-color: rgba(245,194,75,.80);
+  box-shadow: 0 0 0 2px rgba(245,194,75,.14);
 }
-
-
-.showPanelMain{
+.vizStrip{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
   margin-top: 10px;
   padding: 10px 12px;
   border-radius: 16px;
-  border: 1px solid rgba(255,255,255,.12);
-  background: rgba(0,0,0,.16);
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(0,0,0,.14);
 }
-.showPanelMain .select{
-  width: 100%;
+.vizBtn{
+  padding: 10px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(0,0,0,.18);
+  color: rgba(255,255,255,.90);
+  cursor:pointer;
+  font-size: 13px;
+}
+.vizBtn.active{
+  border-color: rgba(245,194,75,.80);
 }
 
 </style>
@@ -710,14 +720,6 @@ body.compact .volMain{ height: 110px; }
 
         <div class="brand">
           <div class="logo" title="Golden Radio Hour" aria-hidden="true"></div>
-<div class="showPanelMain" id="showPanelMain" style="display:none;">
-  <div class="row">
-    <select id="showSelectMain" class="select">
-      <option value="__all__">Select a show…</option>
-    </select>
-  </div>
-  <div class="smallNote">Pick a show, then use Prev/Next to skip episodes.</div>
-</div>
           <div class="titleWrap">
             <div class="title">Old Time Radio Archive — Hosted by Golden Radio Hour</div>
             <div class="subtitle" id="modeSubtitle">Mode: Channel Radio</div>
@@ -800,7 +802,8 @@ body.compact .volMain{ height: 110px; }
               <option value="__all__">Select a show…</option>
             </select>
 
-            </div>
+            <input id="showSearch" type="text" placeholder="Filter episodes in this show..." />
+          </div>
 
           <div class="episodeBox" id="episodeBox"></div>
         
@@ -916,6 +919,7 @@ volMain?.addEventListener("input", () => {
 function syncVolMain(){
   if (volMain) volMain.value = String(audioEl.volume);
 }
+
 
 const btnPrev = document.getElementById("btnPrev");
 const btnPlay = document.getElementById("btnPlay");
@@ -1037,8 +1041,9 @@ const showSection = document.getElementById("showSection");
 const showSelect = document.getElementById("showSelect");
 const btnModeChannel = document.getElementById("btnModeChannel");
 const btnModeShow = document.getElementById("btnModeShow");
-const showPanelMain = document.getElementById("showPanelMain");
-const showSelectMain = document.getElementById("showSelectMain");
+const btnChooseShow = document.getElementById("btnChooseShow");
+const vizStrip = document.getElementById("vizStrip");
+const showSearch = document.getElementById("showSearch");
 const episodeBox = document.getElementById("episodeBox");
 const browsePanel = document.getElementById("browsePanel");
 
@@ -1217,13 +1222,11 @@ if (channelQueue.length){
 function renderShowSelect(){
   const shows = showsList;
   showSelect.innerHTML = `<option value="__all__">Select a show…</option>`;
-  if (showSelectMain) showSelectMain.innerHTML = `<option value="__all__">Select a show…</option>`;
   for (const show of shows){
     const opt = document.createElement("option");
     opt.value = show;
     opt.textContent = show;
     showSelect.appendChild(opt);
-    if (showSelectMain) showSelectMain.appendChild(opt.cloneNode(true));
   }
 }
 
@@ -1265,30 +1268,55 @@ function playShowIndex(i, autoplay=true){
 
 function renderEpisodes(){
   episodeBox.innerHTML = "";
-  if (!currentShow) return;
-
-  const list = showTracks.slice(); // no filtering
-  if (!list.length){
-    episodeBox.innerHTML = `<div class="smallNote">No episodes found for this show.</div>`;
+  if (!currentShow){
+    episodeBox.innerHTML = `<div style="padding:12px;color:rgba(255,255,255,.70)">Pick a show to see episodes.</div>`;
     return;
   }
 
-  list.forEach((t) => {
+  const q = showSearch.value || "";
+  const filtered = applySearch(showTracks, q);
+
+  if (!filtered.length){
+    episodeBox.innerHTML = `<div style="padding:12px;color:rgba(255,255,255,.70)">No matching episodes.</div>`;
+    return;
+  }
+
+  filtered.forEach((t) => {
     const idx = showTracks.indexOf(t);
     const key = `show|${currentShow}|${idx}`;
 
-    const div = document.createElement("div");
-    div.className = "ep" + (key === currentKey ? " active" : "");
-    div.innerHTML = `<div class="epTitle">${escapeHtml(t.title || "Untitled")}</div>
-      <div class="epMeta">${escapeHtml(t.date || "")}</div>`;
+    const row = document.createElement("div");
+    row.className = "epRow";
+    row.dataset.key = key;
 
-    div.addEventListener("click", () => {
-      playShowIndex(idx, true);
-      closeMenu();
+    const left = document.createElement("div");
+    left.className = "epLeft";
+    left.textContent = titleOf(t);
+
+    const right = document.createElement("div");
+    right.className = "epRight";
+    right.textContent = formatTime(t.durationSeconds);
+
+    row.appendChild(left);
+    row.appendChild(right);
+
+    row.addEventListener("click", () => {
+      mode = "show";
+      setModeUI();
+
+      currentKey = key;
+      audioEl.src = t.url;
+      renderNowPlaying(t);
+      statusHintEl.textContent = `Show: ${currentShow} • ${filtered.length} episode(s) listed • Use channel dock for radio mode`;
+      setActiveEpisode(key);
+
+      audioEl.play().catch(()=>{});
     });
 
-    episodeBox.appendChild(div);
+    episodeBox.appendChild(row);
   });
+
+  if (currentKey && currentKey.startsWith("show|")) setActiveEpisode(currentKey);
 }
 
 function enterShowMode(){
@@ -1312,6 +1340,9 @@ showSelect.addEventListener("change", () => {
   renderNowPlaying(showTracks[0] || null);
 });
 
+showSearch.addEventListener("input", renderEpisodes);
+
+
 /* =========================
    UI WIRING
 ========================= */
@@ -1325,26 +1356,6 @@ audioEl.addEventListener("ended", () => {
   }
   loadChannelIndex(channelIndex, true);
 });
-
-
-showSelectMain?.addEventListener("change", () => {
-  const v = showSelectMain.value;
-  if (v === "__all__" || !v){
-    currentShow = null;
-    showTracks = [];
-    episodeBox.innerHTML = "";
-    return;
-  }
-  currentShow = v;
-  showTracks = buildShowTracks(currentShow);
-  renderEpisodes();
-  // Switch to show mode automatically
-  setModeFromUI("show");
-  // Play first episode immediately (older users expect it)
-  playShowIndex(0, true);
-});
-
-
 
 function openModal(){ overlayEl.classList.add("open"); }
 function closeModal(){ overlayEl.classList.remove("open"); }
@@ -1803,29 +1814,46 @@ document.querySelectorAll("#vizRow .pill").forEach(p => {
 
 function setModeFromUI(newMode){
   mode = newMode;
-  // Toggle buttons
-  if (btnModeChannel) btnModeChannel.classList.toggle("active", mode === "channel");
-  if (btnModeShow) btnModeShow.classList.toggle("active", mode === "show");
-  // Toggle main show panel visibility
-  safeShow(showPanelMain, mode === "show");
+  btnModeChannel?.classList.toggle("active", mode === "channel");
+  btnModeShow?.classList.toggle("active", mode === "show");
+  // In show mode, encourage choosing a show
+  btnChooseShow?.classList.toggle("active", mode === "show" && !!currentShow);
   setModeUI();
 }
 
 btnModeChannel?.addEventListener("click", () => {
   setModeFromUI("channel");
+  // resume channel playback if user had switched modes
+  if (currentChannel) switchChannel(currentChannel, false);
 });
 
 btnModeShow?.addEventListener("click", () => {
   setModeFromUI("show");
+  // If no show selected yet, prompt them immediately
+  if (!currentShow) openMenu();
 });
 
+btnChooseShow?.addEventListener("click", () => {
+  setModeFromUI("show");
+  openMenu();
+});
+
+// Visualizer buttons on main page
+vizStrip?.querySelectorAll("[data-viz]")?.forEach(btn => {
+  btn.addEventListener("click", () => {
+    const v = btn.getAttribute("data-viz");
+    vizStrip.querySelectorAll("[data-viz]").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    setVisualizer(v);
+  });
+});
 
 async function init(){
   setModeUI();
   renderDock();
   renderModalChannels();
   setVolume(0.6);
-  if (typeof syncVolMain === "function") syncVolMain();
+  syncVolMain();
   setVisualizer("none");
   trackTitleEl.textContent = "Loading library…";
   metaLineEl.textContent = "—";
