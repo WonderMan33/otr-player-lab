@@ -82,10 +82,7 @@
     .titleLine{ font-weight: 900; letter-spacing: .4px; font-size: 14px; margin: 2px 0 6px; }
     .metaLine{ font-size: 12px; color: var(--muted); margin: 0 0 12px; min-height: 16px; }
 
-    .playerRow{ display:flex; align-items:flex-end; gap:12px; flex-wrap:wrap; }
     .controls{
-      flex:1;
-      min-width: 280px;
       border: 1px solid rgba(255,255,255,.10);
       border-radius: 18px;
       padding: 12px;
@@ -108,23 +105,32 @@
       border-color: rgba(245,194,75,.70);
       background: rgba(245,194,75,.12);
     }
-    .timeRow{ display:flex; align-items:center; gap:10px; font-size: 12px; color: var(--muted); }
+
     .range{ width:100%; accent-color: var(--gold); }
 
-    /* Vertical volume */
-    .volRail{
-      width: 52px;
-      display:flex; align-items:center; justify-content:center;
-      padding: 8px 6px;
+    .timeRow{ display:flex; align-items:center; gap:10px; font-size: 12px; color: var(--muted); margin-top: 6px; }
+    .timeRow .spacer{ flex:1; }
+
+    /* Volume under seek bar */
+    .volumeRow{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-top: 10px;
+      padding: 8px 10px;
+      border-radius: 14px;
       border: 1px solid rgba(255,255,255,.10);
-      border-radius: 18px;
-      background: rgba(0,0,0,.18);
+      background: rgba(0,0,0,.16);
     }
-    .volMain{
-      height: 150px;
-      width: 28px;
-      writing-mode: vertical-lr;
-      direction: rtl;
+    .volumeRow label{
+      font-size: 12px;
+      color: rgba(255,255,255,.75);
+      white-space: nowrap;
+      letter-spacing: .4px;
+    }
+    .volumeRow input[type="range"]{
+      width: min(320px, 100%);
+      flex: 1;
       accent-color: var(--gold);
     }
 
@@ -207,7 +213,7 @@
     </header>
 
     <div class="modePills">
-      <button class="pillBtn active" id="pillListenChannel" type="button">Listen by Channel</button>
+      <button class="pillBtn active" id="pillListenChannel" type="button">Listen to Channel</button>
       <button class="pillBtn" id="pillListenShow" type="button">Listen by Show</button>
     </div>
 
@@ -215,26 +221,25 @@
       <div class="titleLine" id="nowTitle">Loading…</div>
       <div class="metaLine" id="nowMeta"> </div>
 
-      <div class="playerRow">
-        <div class="controls">
-          <div class="btnRow">
-            <button class="btn" id="btnPrev" type="button">⟵ Prev</button>
-            <button class="btn primary" id="btnPlay" type="button">Play</button>
-            <button class="btn" id="btnNext" type="button">Next ⟶</button>
-            <button class="btn" id="btnStop" type="button">Stop</button>
-          </div>
-
-          <input class="range" id="seek" type="range" min="0" max="1000" value="0" />
-
-          <div class="timeRow">
-            <div id="tCur">0:00</div>
-            <div style="flex:1"></div>
-            <div id="tDur">0:00</div>
-          </div>
+      <div class="controls">
+        <div class="btnRow">
+          <button class="btn" id="btnPrev" type="button">⟵ Prev</button>
+          <button class="btn primary" id="btnPlay" type="button">Play</button>
+          <button class="btn" id="btnNext" type="button">Next ⟶</button>
+          <button class="btn" id="btnStop" type="button">Stop</button>
         </div>
 
-        <div class="volRail" title="Volume">
-          <input id="volMain" class="volMain" type="range" min="0" max="1" step="0.01" value="0.6" aria-label="Volume" />
+        <input class="range" id="seek" type="range" min="0" max="1000" value="0" />
+
+        <div class="timeRow">
+          <div id="tCur">0:00</div>
+          <div class="spacer"></div>
+          <div id="tDur">0:00</div>
+        </div>
+
+        <div class="volumeRow">
+          <label for="volMain">Volume</label>
+          <input id="volMain" type="range" min="0" max="1" step="0.01" value="0.6" />
         </div>
       </div>
 
@@ -246,7 +251,7 @@
             <option value="__all__">Select a show…</option>
           </select>
         </div>
-        <div class="smallNote">Pick a show to start (no autoplay until you choose). Then use Prev/Next to skip episodes.</div>
+        <div class="smallNote">Pick a show to browse episodes. (Channel buttons hide while in Show mode.)</div>
         <div class="episodeBox" id="episodeBox"></div>
       </div>
     </div>
