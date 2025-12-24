@@ -219,6 +219,45 @@
     }
     audio{ width:100%; }
 
+/* Custom player bar (skip buttons live here) */
+.playerBar{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding: 10px 0 0;
+  width: min(820px, 100%);
+  margin: 0 auto;
+}
+.pbtn{
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border:1px solid var(--line);
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.30));
+  color: rgba(255,255,255,.92);
+  display:grid;
+  place-items:center;
+  cursor:pointer;
+  user-select:none;
+  box-shadow:
+    inset 0 1px 2px rgba(255,255,255,.10),
+    0 10px 22px rgba(0,0,0,.45);
+}
+.pbtn:hover{ border-color: rgba(245,194,75,.55); }
+.pbtn:active{ transform: translateY(1px); }
+.ptime{
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  color: rgba(255,255,255,.70);
+  min-width: 46px;
+  text-align:center;
+}
+.seek{
+  flex: 1 1 auto;
+  width: 100%;
+  accent-color: var(--accent);
+}
+
     .tinyHint{
       font-size:12px;
       color: rgba(255,255,255,.55);
@@ -511,6 +550,22 @@
       outline:none;
       box-shadow: inset 0 1px 2px rgba(255,255,255,.08);
     }
+/* Compact mode: show more visualizer */
+body.compact .stageInner{
+  padding: 12px 12px 10px;
+  min-height: 240px;
+}
+body.compact .stageTopNote{ margin-bottom: 6px; }
+body.compact .nowLine{ margin-bottom: 8px; font-size: 18px; }
+body.compact .dividerSwirl{ margin: 6px 0 10px; }
+body.compact .trackTitle{
+  font-size: 18px;
+  letter-spacing: 1.6px;
+  margin: 0 0 8px;
+}
+body.compact .metaLine{ margin: 0 0 10px; }
+body.compact .audioWrap{ padding: 8px 10px 6px; }
+body.compact .playerBar{ padding: 8px 0 0; }
 
     @media (max-width: 640px){
       .title{ font-size: 15px; }
@@ -577,7 +632,19 @@
         <div class="metaLine" id="metaLine">—</div>
 
         <div class="audioWrap">
-          <audio id="audio" controls preload="none"></audio>
+          <audio id="audio" preload="none"></audio>
+
+<div class="playerBar" id="playerBar" aria-label="Player controls">
+  <button class="pbtn" id="btnPrev" type="button" title="Previous (episode/channel item)">⟵</button>
+  <button class="pbtn" id="btnPlay" type="button" title="Play/Pause">▶</button>
+  <button class="pbtn" id="btnNext" type="button" title="Next (episode/channel item)">⟶</button>
+
+  <div class="ptime" id="timeNow">0:00</div>
+
+  <input id="seek" class="seek" type="range" min="0" max="1000" value="0" step="1" aria-label="Seek" />
+
+  <div class="ptime" id="timeTotal">0:00</div>
+</div>
           <div class="tinyHint" id="statusHint">
             Tip: pick a channel below for continuous play, or open Menu → Browse by Show.
           </div>
@@ -622,13 +689,7 @@
         <div class="section" id="showSection" style="display:none;">
           <h3>Browse by Show</h3>
           <p>Pick a show, then click an episode to play.</p>
-
-          <div class="row" style="margin:10px 0 0;justify-content:space-between;">
-            <div style="display:flex;gap:10px;flex-wrap:wrap;">
-              <button class="pill" id="btnPrevEp" type="button" style="padding:10px 14px;">⟵ Prev</button>
-              <button class="pill" id="btnNextEp" type="button" style="padding:10px 14px;">Next ⟶</button>
-            </div>
-            <div style="font-size:12px;color:rgba(255,255,255,.62);">
+<div style="font-size:12px;color:rgba(255,255,255,.62);">
               Works in <b>Browse by Show</b> after you pick a show.
             </div>
           </div>
@@ -659,6 +720,15 @@
             If the visualizer looks flat, your MP3 host may need CORS enabled. If MP3s are on the same domain, you’re good.
           </p>
         </div>
+
+        <div class="section">
+  <h3>Player Size</h3>
+  <p>Compact mode shows more of the visualizer.</p>
+  <div class="pillRow" id="sizeRow">
+    <div class="pill active" data-size="normal">Normal</div>
+    <div class="pill" data-size="compact">Compact</div>
+  </div>
+</div>
 
         <div class="section">
           <h3>Volume</h3>
@@ -704,6 +774,92 @@ let currentKey = null;
 
 const audioEl = document.getElementById("audio");
 
+const btnPrev = document.getElementById("btnPrev");
+const btnPlay = document.getElementById("btnPlay");
+const btnNext = document.getElementById("btnNext");
+const seek = document.getElementById("seek");
+const timeNow = document.getElementById("timeNow");
+const timeTotal = document.getElementById("timeTotal");
+
+let isSeeking = false;
+
+function fmtTime(s){
+  if (!Number.isFinite(s) || s < 0) return "0:00";
+  s = Math.floor(s);
+  const m = Math.floor(s/60);
+  const r = s%60;
+  return `${m}:${String(r).padStart(2,"0")}`;
+}
+
+function syncPlayIcon(){
+  btnPlay.textContent = audioEl.paused ? "▶" : "❚❚";
+}
+
+btnPlay.addEventListener("click", () => {
+  if (!audioEl.src) return;
+  if (audioEl.paused) audioEl.play().catch(()=>{});
+  else audioEl.pause();
+});
+
+audioEl.addEventListener("play", syncPlayIcon);
+audioEl.addEventListener("pause", syncPlayIcon);
+
+audioEl.addEventListener("loadedmetadata", () => {
+  timeTotal.textContent = fmtTime(audioEl.duration);
+});
+
+audioEl.addEventListener("timeupdate", () => {
+  timeNow.textContent = fmtTime(audioEl.currentTime);
+  if (!isSeeking && Number.isFinite(audioEl.duration) && audioEl.duration > 0){
+    seek.value = String(Math.round((audioEl.currentTime / audioEl.duration) * 1000));
+  }
+});
+
+seek.addEventListener("input", () => { isSeeking = true; });
+seek.addEventListener("change", () => {
+  if (!Number.isFinite(audioEl.duration) || audioEl.duration <= 0) { isSeeking = false; return; }
+  const pct = Number(seek.value) / 1000;
+  audioEl.currentTime = pct * audioEl.duration;
+  isSeeking = false;
+});
+
+/* Unified skip (buttons live by the progress bar) */
+function currentShowIndex(){
+  if (!currentKey || !currentKey.startsWith("show|")) return 0;
+  const parts = currentKey.split("|");
+  const idx = parseInt(parts[2] || "0", 10);
+  return Number.isFinite(idx) ? idx : 0;
+}
+
+btnPrev.addEventListener("click", () => {
+  if (mode === "show"){
+    playShowIndex(currentShowIndex() - 1, true);
+  } else {
+    if (!channelQueue.length) return;
+    const prev = (channelIndex - 1 + channelQueue.length) % channelQueue.length;
+    loadChannelIndex(prev, true);
+  }
+});
+
+btnNext.addEventListener("click", () => {
+  if (mode === "show"){
+    playShowIndex(currentShowIndex() + 1, true);
+  } else {
+    if (!channelQueue.length) return;
+    const nxt = (channelIndex + 1) % channelQueue.length;
+    loadChannelIndex(nxt, true);
+  }
+});
+
+/* Player size */
+document.querySelectorAll("#sizeRow .pill").forEach(p => {
+  p.addEventListener("click", () => {
+    document.querySelectorAll("#sizeRow .pill").forEach(x => x.classList.remove("active"));
+    p.classList.add("active");
+    document.body.classList.toggle("compact", p.dataset.size === "compact");
+  });
+});
+
 // IMPORTANT for visualizers with remote audio (requires CORS headers on the MP3 host)
 audioEl.crossOrigin = "anonymous";
 
@@ -738,8 +894,6 @@ const showSelect = document.getElementById("showSelect");
 const showSearch = document.getElementById("showSearch");
 const episodeBox = document.getElementById("episodeBox");
 
-const btnPrevEp = document.getElementById("btnPrevEp");
-const btnNextEp = document.getElementById("btnNextEp");
 
 
 /* =========================
@@ -1070,29 +1224,6 @@ showSelect.addEventListener("change", () => {
 });
 
 showSearch.addEventListener("input", renderEpisodes);
-
-
-btnPrevEp?.addEventListener("click", () => {
-  if (!currentShow || !showTracks.length) return;
-  let idx = 0;
-  if (currentKey && currentKey.startsWith("show|")){
-    const parts = currentKey.split("|");
-    idx = parseInt(parts[2] || "0", 10);
-    if (!Number.isFinite(idx)) idx = 0;
-  }
-  playShowIndex(idx - 1, true);
-});
-
-btnNextEp?.addEventListener("click", () => {
-  if (!currentShow || !showTracks.length) return;
-  let idx = 0;
-  if (currentKey && currentKey.startsWith("show|")){
-    const parts = currentKey.split("|");
-    idx = parseInt(parts[2] || "0", 10);
-    if (!Number.isFinite(idx)) idx = 0;
-  }
-  playShowIndex(idx + 1, true);
-});
 
 
 /* =========================
@@ -1558,6 +1689,7 @@ async function init(){
   renderModalChannels();
   setVolume(0.6);
   setVisualizer("none");
+  syncPlayIcon();
 
   try{
     const res = await fetch(DATA_URL, { cache: "no-store" });
