@@ -652,8 +652,9 @@ body.compact .playerBar{ padding: 8px 0 0; }
 .volMain{
   height: 150px;
   width: 28px;
-  writing-mode: bt-lr;
-  -webkit-appearance: slider-vertical;
+  writing-mode: vertical-lr;
+  direction: rtl;
+  
 }
 body.compact .volMain{ height: 120px; }
 
@@ -1854,10 +1855,6 @@ btnModeChannel?.addEventListener("click", () => {
 
 btnModeShow?.addEventListener("click", () => {
   setModeFromUI("show");
-});
-
-  setModeFromUI("show");
-  openMenu();
 });
 
 // Visualizer buttons on main page
