@@ -575,6 +575,67 @@ body.compact .playerBar{ padding: 8px 0 0; }
       .chanLabel{ font-size: 13px; }
       .searchInput{ width: 52vw; }
     }
+  
+    /* Collapsible player */
+    body.collapsed .stageInner{
+      padding: 10px 12px 8px;
+      min-height: 140px;
+    }
+    body.collapsed .stageTopNote,
+    body.collapsed .dividerSwirl,
+    body.collapsed #metaLine{
+      display:none !important;
+    }
+    body.collapsed .nowLine{
+      margin: 0 0 6px;
+      font-size: 16px;
+    }
+    body.collapsed .trackTitle{
+      margin: 0 0 6px;
+      font-size: 16px;
+      letter-spacing: 1.2px;
+      text-transform: none;
+      font-weight: 650;
+    }
+    body.collapsed .audioWrap{
+      margin-top: 0;
+      border-top: 0;
+      padding-top: 6px;
+    }
+
+    /* Browse panel under channels */
+    .browsePanel{
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(0,0,0,.45));
+      box-shadow: 0 18px 60px rgba(0,0,0,.55);
+      padding: 14px;
+      display:none;
+    }
+    .browsePanel.open{ display:block; }
+    .browseHeader{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .browseHeader h2{
+      margin:0;
+      font-size: 16px;
+      letter-spacing:.2px;
+      color: rgba(255,255,255,.92);
+      text-decoration: underline;
+      text-underline-offset: 4px;
+      text-decoration-thickness: 2px;
+    }
+    .browseHeader .hint{
+      margin:0;
+      font-size:12px;
+      color: rgba(255,255,255,.62);
+    }
+
   </style>
 </head>
 
@@ -605,6 +666,12 @@ body.compact .playerBar{ padding: 8px 0 0; }
       </div>
 
       <div class="topRight">
+        <button class="iconBtn" id="btnCollapse" title="Collapse/Expand Player">
+          <svg id="collapseIcon" width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+
         <button class="iconBtn" id="btnMenu" title="Menu">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
             <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -655,6 +722,27 @@ body.compact .playerBar{ padding: 8px 0 0; }
     <nav class="dock" aria-label="Channels">
       <div class="dockRow" id="dockRow"></div>
     </nav>
+
+
+    <section class="browsePanel" id="browsePanel" aria-label="Browse by Show Panel">
+      <div class="browseHeader"><h2>Browse by Show</h2><p class="hint">Pick a show, then use the episode list or the Prev/Next buttons.</p></div>
+          <div style="font-size:12px;color:rgba(255,255,255,.62);">
+              Works in <b>Browse by Show</b> after you pick a show.
+            </div>
+          </div>
+
+          <div class="row">
+            <select id="showSelect">
+              <option value="__all__">Select a show…</option>
+            </select>
+
+            <input id="showSearch" type="text" placeholder="Filter episodes in this show..." />
+          </div>
+
+          <div class="episodeBox" id="episodeBox"></div>
+        
+    </section>
+
   </div>
 
   <!-- Modal -->
@@ -684,25 +772,6 @@ body.compact .playerBar{ padding: 8px 0 0; }
           <p>What’s next in the current channel rotation.</p>
           <div class="pillRow" id="modalChannelRow"></div>
           <ul class="scheduleList" id="scheduleList" style="margin:8px 0 0;padding:0;list-style:none;border-top:1px solid rgba(255,255,255,.10)"></ul>
-        </div>
-
-        <div class="section" id="showSection" style="display:none;">
-          <h3>Browse by Show</h3>
-          <p>Pick a show, then click an episode to play.</p>
-<div style="font-size:12px;color:rgba(255,255,255,.62);">
-              Works in <b>Browse by Show</b> after you pick a show.
-            </div>
-          </div>
-
-          <div class="row">
-            <select id="showSelect">
-              <option value="__all__">Select a show…</option>
-            </select>
-
-            <input id="showSearch" type="text" placeholder="Filter episodes in this show..." />
-          </div>
-
-          <div class="episodeBox" id="episodeBox"></div>
         </div>
 
         <div class="section">
@@ -876,6 +945,9 @@ const scheduleListEl = document.getElementById("scheduleList");
 
 const overlayEl = document.getElementById("overlay");
 const btnMenu = document.getElementById("btnMenu");
+const btnCollapse = document.getElementById("btnCollapse");
+const collapseIcon = document.getElementById("collapseIcon");
+
 const btnClose = document.getElementById("btnClose");
 
 const btnSearch = document.getElementById("btnSearch");
@@ -893,6 +965,8 @@ const showSection = document.getElementById("showSection");
 const showSelect = document.getElementById("showSelect");
 const showSearch = document.getElementById("showSearch");
 const episodeBox = document.getElementById("episodeBox");
+const browsePanel = document.getElementById("browsePanel");
+
 
 
 
@@ -977,7 +1051,10 @@ function setModeUI(){
   if (active) active.classList.add("active");
 
   channelSection.style.display = (mode === "channel") ? "" : "none";
-  showSection.style.display = (mode === "show") ? "" : "none";
+  showSection.style.display = "none";
+
+  // Browse panel under channels
+  if (browsePanel) browsePanel.classList.toggle("open", mode === "show");
 
   if (mode === "channel"){
     modeSubtitleEl.textContent = "Mode: Channel Radio";
@@ -1245,6 +1322,17 @@ function closeModal(){ overlayEl.classList.remove("open"); }
 
 btnMenu.addEventListener("click", openModal);
 btnClose.addEventListener("click", closeModal);
+
+btnCollapse?.addEventListener("click", () => {
+  const isCollapsed = document.body.classList.toggle("collapsed");
+  // flip icon (down vs up)
+  if (collapseIcon){
+    collapseIcon.innerHTML = isCollapsed
+      ? '<path d="M6 15l6-6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'
+      : '<path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
+  }
+});
+
 overlayEl.addEventListener("click", (e) => { if (e.target === overlayEl) closeModal(); });
 
 btnSearch.addEventListener("click", () => {
