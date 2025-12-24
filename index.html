@@ -654,12 +654,10 @@ body.compact .playerBar{ padding: 8px 0 0; }
   width: 28px;
   writing-mode: vertical-lr;
   direction: rtl;
-  
 }
 body.compact .volMain{ height: 120px; }
 
-
-.mainControls{
+.mainModes{
   display:flex;
   gap:10px;
   flex-wrap:wrap;
@@ -680,6 +678,16 @@ body.compact .volMain{ height: 120px; }
   border-color: rgba(245,194,75,.80);
   box-shadow: 0 0 0 2px rgba(245,194,75,.14);
 }
+
+.showPickerPanel{
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(0,0,0,.14);
+}
+.showPickerPanel .select{ width:100%; }
+
 .vizStrip{
   display:flex;
   gap:8px;
@@ -699,19 +707,7 @@ body.compact .volMain{ height: 120px; }
   cursor:pointer;
   font-size: 13px;
 }
-.vizBtn.active{
-  border-color: rgba(245,194,75,.80);
-}
-
-
-.showPickerPanel{
-  margin-top: 10px;
-  padding: 10px 12px;
-  border-radius: 16px;
-  border: 1px solid rgba(255,255,255,.10);
-  background: rgba(0,0,0,.14);
-}
-.showPickerPanel .select{ width:100%; }
+.vizBtn.active{ border-color: rgba(245,194,75,.80); }
 
 </style>
 </head>
@@ -813,8 +809,7 @@ body.compact .volMain{ height: 120px; }
               <option value="__all__">Select a show…</option>
             </select>
 
-            <input id="showSearch" type="text" placeholder="Filter episodes in this show..." />
-          </div>
+            </div>
 
           <div class="episodeBox" id="episodeBox"></div>
         
@@ -922,14 +917,9 @@ let showTracks = [];
 let currentKey = null;
 
 const audioEl = document.getElementById("audio");
-
 const volMain = document.getElementById("volMain");
-volMain?.addEventListener("input", () => {
-  audioEl.volume = Number(volMain.value);
-});
-function syncVolMain(){
-  if (volMain) volMain.value = String(audioEl.volume);
-}
+function syncVolMain(){ if (volMain) volMain.value = String(audioEl.volume); }
+volMain?.addEventListener("input", () => { audioEl.volume = Number(volMain.value); });
 
 
 const btnPrev = document.getElementById("btnPrev");
@@ -1055,7 +1045,6 @@ const btnModeShow = document.getElementById("btnModeShow");
 const showPickerPanel = document.getElementById("showPickerPanel");
 const showSelectInline = document.getElementById("showSelectInline");
 const vizStrip = document.getElementById("vizStrip");
-const showSearch = document.getElementById("showSearch");
 const episodeBox = document.getElementById("episodeBox");
 const browsePanel = document.getElementById("browsePanel");
 
@@ -1287,8 +1276,7 @@ function renderEpisodes(){
     return;
   }
 
-  const q = showSearch.value || "";
-  const filtered = applySearch(showTracks, q);
+  const q =   const filtered = applySearch(showTracks, q);
 
   if (!filtered.length){
     episodeBox.innerHTML = `<div style="padding:12px;color:rgba(255,255,255,.70)">No matching episodes.</div>`;
@@ -1354,9 +1342,6 @@ showSelect.addEventListener("change", () => {
   renderNowPlaying(showTracks[0] || null);
 });
 
-showSearch.addEventListener("input", renderEpisodes);
-
-
 /* =========================
    UI WIRING
 ========================= */
@@ -1371,19 +1356,6 @@ audioEl.addEventListener("ended", () => {
   loadChannelIndex(channelIndex, true);
 });
 
-
-showSelectInline?.addEventListener("change", () => {
-  const v = showSelectInline.value;
-  if (v === "__all__" || !v) return;
-
-  currentShow = v;
-  showTracks = buildShowTracks(currentShow);
-  renderEpisodes();
-
-  // Stay in show mode and start only after selection
-  setModeFromUI("show");
-  playShowIndex(0, true);
-});
 function openModal(){ overlayEl.classList.add("open"); }
 function closeModal(){ overlayEl.classList.remove("open"); }
 
@@ -1841,27 +1813,28 @@ document.querySelectorAll("#vizRow .pill").forEach(p => {
 
 function setModeFromUI(newMode){
   mode = newMode;
-
   const dockEl = document.getElementById("dock");
-  // Buttons state
+
   btnModeChannel?.classList.toggle("active", mode === "channel");
   btnModeShow?.classList.toggle("active", mode === "show");
 
-  // Show/hide primary controls
-  safeShow(dockEl, mode === "channel");          // channel buttons only in channel mode
-  safeShow(showPickerPanel, mode === "show");    // show dropdown only in show mode
+  // Channel buttons only in Channel mode
+  safeShow(dockEl, mode === "channel");
+  // Show dropdown only in Show mode
+  safeShow(showPickerPanel, mode === "show");
 
   setModeUI();
 }
 
 btnModeChannel?.addEventListener("click", () => {
   setModeFromUI("channel");
-  // No forced autoplay; just keep current state.
 });
+
 btnModeShow?.addEventListener("click", () => {
   setModeFromUI("show");
-  // No autoplay. User must pick a show.
+  // No autoplay — wait for show selection
 });
+
 // Visualizer buttons on main page
 vizStrip?.querySelectorAll("[data-viz]")?.forEach(btn => {
   btn.addEventListener("click", () => {
@@ -1872,9 +1845,22 @@ vizStrip?.querySelectorAll("[data-viz]")?.forEach(btn => {
   });
 });
 
+showSelectInline?.addEventListener("change", () => {
+  const v = showSelectInline.value;
+  if (v === "__all__" || !v) return;
+
+  currentShow = v;
+  showTracks = buildShowTracks(currentShow);
+  renderEpisodes();
+  setModeFromUI("show");
+  playShowIndex(0, true);
+});
+
+
 async function init(){
   setModeUI();
   renderDock();
+  setModeFromUI("channel");
   renderModalChannels();
   setVolume(0.6);
   syncVolMain();
