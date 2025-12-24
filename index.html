@@ -605,6 +605,11 @@
   const volMain = document.getElementById("volMain");
 
   const audioEl = document.getElementById("audio");
+  
+  // Fullscreen elements (declared early to avoid TDZ)
+  var fsOverlay=null, fsCanvas=null, fsExitBtn=null, fsNow=null, fsPrev=null, fsPlay=null, fsNext=null, fsStop=null, fsSeek=null, fsTCur=null, fsTDur=null, fsVol=null, fsVizStrip=null;
+  var inFullscreen=false;
+
   audioEl.volume = Number(volMain.value || 0.6);
 
   // ---------- app state ----------
@@ -925,23 +930,21 @@
   const vizBox = document.querySelector(".viz");
   const vizFullscreenBtn = document.getElementById("vizFullscreenBtn");
 
-  const fsOverlay = document.getElementById("fsOverlay");
-  const fsCanvas = document.getElementById("fsCanvas");
-  const fsExitBtn = document.getElementById("fsExitBtn");
-  const fsNow = document.getElementById("fsNow");
-  const fsPrev = document.getElementById("fsPrev");
-  const fsPlay = document.getElementById("fsPlay");
-  const fsNext = document.getElementById("fsNext");
-  const fsStop = document.getElementById("fsStop");
-  const fsSeek = document.getElementById("fsSeek");
-  const fsTCur = document.getElementById("fsTCur");
-  const fsTDur = document.getElementById("fsTDur");
-  const fsVol = document.getElementById("fsVol");
-  const fsVizStrip = document.getElementById("fsVizStrip");
-
-  let inFullscreen = false;
-
+  fsOverlay = document.getElementById("fsOverlay");
+  fsCanvas = document.getElementById("fsCanvas");
+  fsExitBtn = document.getElementById("fsExitBtn");
+  fsNow = document.getElementById("fsNow");
+  fsPrev = document.getElementById("fsPrev");
+  fsPlay = document.getElementById("fsPlay");
+  fsNext = document.getElementById("fsNext");
+  fsStop = document.getElementById("fsStop");
+  fsSeek = document.getElementById("fsSeek");
+  fsTCur = document.getElementById("fsTCur");
+  fsTDur = document.getElementById("fsTDur");
+  fsVol = document.getElementById("fsVol");
+  fsVizStrip = document.getElementById("fsVizStrip");
   function showFs(on){
+    if(!fsOverlay) return;
     fsOverlay.style.display = on ? "block" : "none";
     fsOverlay.setAttribute("aria-hidden", on ? "false" : "true");
     inFullscreen = on;
@@ -1087,8 +1090,10 @@
 
     // draw to fullscreen canvas if active
     if(typeof inFullscreen !== "undefined" && inFullscreen){
+      if(fsCanvas){
       const fsCtx = fsCanvas.getContext("2d");
       drawTo(fsCanvas, fsCtx);
+    }
     }
   }
 
