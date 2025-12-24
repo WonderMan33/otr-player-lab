@@ -1960,12 +1960,8 @@ showSelectInline?.addEventListener("change", () => {
   playShowIndex(0, true);
 });
 
-btnModeChannel?.addEventListener("click", () => {
-  setModeFromUI("channel");
 });
 
-btnModeShow?.addEventListener("click", () => {
-  setModeFromUI("show");
   // No autoplay — wait for show selection
 });
 
@@ -1979,10 +1975,6 @@ vizStrip?.querySelectorAll("[data-viz]")?.forEach(btn => {
   });
 });
 
-renderEpisodes();
-  setModeFromUI("show");
-  playShowIndex(0, true);
-});
 
 
 async function init(){
