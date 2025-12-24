@@ -710,6 +710,23 @@ body.compact .volMain{ height: 120px; }
 }
 .vizBtn.active{ border-color: rgba(245,194,75,.80); }
 
+
+/* Smaller, cleaner show dropdown */
+.showPickerPanel .select,
+#showSelectInline{
+  max-width: 420px;
+  width: 100%;
+  font-size: 14px;
+  padding: 10px 12px;
+}
+@media (max-width: 520px){
+  .showPickerPanel .select,
+  #showSelectInline{
+    max-width: 100%;
+    font-size: 15px;
+  }
+}
+
 </style>
 </head>
 
@@ -1802,9 +1819,13 @@ document.querySelectorAll("#vizRow .pill").forEach(p => {
    INIT
 ========================= */
 
+function getDockEl(){
+  return document.getElementById("dock") || document.getElementById("dockWrap") || document.querySelector(".dock");
+}
+
 function setModeFromUI(newMode){
   mode = newMode;
-  const dockEl = document.getElementById("dock");
+  const dockEl = getDockEl();
 
   btnModeChannel?.classList.toggle("active", mode === "channel");
   btnModeShow?.classList.toggle("active", mode === "show");
