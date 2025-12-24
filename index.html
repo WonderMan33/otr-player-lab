@@ -1046,6 +1046,8 @@ function setActiveDock(){
   });
 }
 
+const safeShow = (el, show) => { if (el) el.style.display = show ? "" : "none"; };
+
 function setModeUI(){
   document.querySelectorAll("#modeRow .pill").forEach(p => p.classList.remove("active"));
   const active = modeRow.querySelector(`[data-mode="${mode}"]`);
