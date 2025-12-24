@@ -1276,10 +1276,10 @@ function renderEpisodes(){
     return;
   }
 
-  const q =   const filtered = applySearch(showTracks, q);
+  const filtered = showTracks.slice(); // no text filter box
 
   if (!filtered.length){
-    episodeBox.innerHTML = `<div style="padding:12px;color:rgba(255,255,255,.70)">No matching episodes.</div>`;
+    episodeBox.innerHTML = `<div style="padding:12px;color:rgba(255,255,255,.70)">No episodes found for this show.</div>`;
     return;
   }
 
@@ -1288,37 +1288,17 @@ function renderEpisodes(){
     const key = `show|${currentShow}|${idx}`;
 
     const row = document.createElement("div");
-    row.className = "epRow";
+    row.className = "epRow" + (key === currentKey ? " active" : "");
     row.dataset.key = key;
-
-    const left = document.createElement("div");
-    left.className = "epLeft";
-    left.textContent = titleOf(t);
-
-    const right = document.createElement("div");
-    right.className = "epRight";
-    right.textContent = formatTime(t.durationSeconds);
-
-    row.appendChild(left);
-    row.appendChild(right);
+    row.innerHTML = `<div class="epTitle">${escapeHtml(t.title || "Untitled")}</div>
+      <div class="epMeta">${escapeHtml(t.date || "")}</div>`;
 
     row.addEventListener("click", () => {
-      mode = "show";
-      setModeUI();
-
-      currentKey = key;
-      audioEl.src = t.url;
-      renderNowPlaying(t);
-      statusHintEl.textContent = `Show: ${currentShow} • ${filtered.length} episode(s) listed • Use channel dock for radio mode`;
-      setActiveEpisode(key);
-
-      audioEl.play().catch(()=>{});
+      playShowIndex(idx, true);
     });
 
     episodeBox.appendChild(row);
   });
-
-  if (currentKey && currentKey.startsWith("show|")) setActiveEpisode(currentKey);
 }
 
 function enterShowMode(){
