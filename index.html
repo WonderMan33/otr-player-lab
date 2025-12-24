@@ -771,7 +771,7 @@ body.compact .playerBar{ padding: 8px 0 0; }
           <h3>Schedule</h3>
           <p>What’s next in the current channel rotation.</p>
           <div class="pillRow" id="modalChannelRow"></div>
-          <ul class="scheduleList" id="scheduleList" style="margin:8px 0 0;padding:0;list-style:none;border-top:1px solid rgba(255,255,255,.10)"></ul>
+          
         </div>
 
         <div class="section">
@@ -941,8 +941,6 @@ const modeSubtitleEl = document.getElementById("modeSubtitle");
 
 const dockRowEl = document.getElementById("dockRow");
 const modalChannelRowEl = document.getElementById("modalChannelRow");
-const scheduleListEl = document.getElementById("scheduleList");
-
 const overlayEl = document.getElementById("overlay");
 const btnMenu = document.getElementById("btnMenu");
 const btnCollapse = document.getElementById("btnCollapse");
@@ -1102,41 +1100,6 @@ function renderNowPlaying(track){
   metaLineEl.textContent = extras.join(" • ");
 }
 
-function renderSchedule(){
-  scheduleListEl.innerHTML = "";
-
-  if (!channelQueue.length){
-    const li = document.createElement("li");
-    li.textContent = "No items found in this channel.";
-    li.style.padding = "10px 2px";
-    scheduleListEl.appendChild(li);
-    return;
-  }
-
-  for (let i = 1; i <= 10; i++){
-    const idx = (channelIndex + i) % channelQueue.length;
-    const t = channelQueue[idx];
-
-    const li = document.createElement("li");
-    li.style.padding = "10px 2px";
-    li.style.borderBottom = "1px solid rgba(255,255,255,.08)";
-    li.style.display = "flex";
-    li.style.justifyContent = "space-between";
-    li.style.gap = "10px";
-
-    const left = document.createElement("span");
-    left.textContent = `${i}. ${titleOf(t)}`;
-
-    const right = document.createElement("small");
-    right.textContent = t.show || t.showTitle || "";
-    right.style.color = "rgba(255,255,255,.60)";
-    right.style.whiteSpace = "nowrap";
-
-    li.appendChild(left);
-    li.appendChild(right);
-    scheduleListEl.appendChild(li);
-  }
-}
 
 function loadChannelIndex(i, autoplay){
   if (!channelQueue.length) return;
@@ -1146,9 +1109,7 @@ function loadChannelIndex(i, autoplay){
 
   audioEl.src = t.url;
   renderNowPlaying(t);
-  renderSchedule();
-
-  statusHintEl.textContent =
+statusHintEl.textContent =
     `Channel: ${currentChannel} • ${channelQueue.length} item(s) in rotation` +
     (searchQuery ? " • filtered" : "") +
     " • Menu → Browse by Show for manual picking";
@@ -1166,9 +1127,7 @@ function switchChannel(channel, autoplay){
 
   setActiveDock();
   renderNowPlaying(channelQueue[0] || null);
-  renderSchedule();
-
-  if (channelQueue.length){
+if (channelQueue.length){
     audioEl.src = channelQueue[0].url;
     if (autoplay) audioEl.play().catch(()=>{});
   } else {
@@ -1780,12 +1739,14 @@ async function init(){
   syncPlayIcon();
 
   try{
+    console.log("Loading JSON:", DATA_URL);
     const res = await fetch(DATA_URL, { cache: "no-store" });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     if (!Array.isArray(data)) throw new Error("shows.json must be a JSON array of tracks.");
 
     allTracks = data;
+    console.log("Loaded tracks:", allTracks.length);
 
     renderShowSelect();
 
