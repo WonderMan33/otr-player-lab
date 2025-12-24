@@ -316,6 +316,117 @@
       font-size: 12px;
       color: var(--muted);
     }
+  
+    /* Fullscreen overlay */
+    .fsOverlay{
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background:
+        radial-gradient(1200px 800px at 30% 10%, rgba(245,194,75,.18), transparent 60%),
+        radial-gradient(1200px 800px at 80% 20%, rgba(255,255,255,.06), transparent 60%),
+        linear-gradient(180deg, #050505, #0b0b0b);
+    }
+    .fsCanvasWrap{
+      position:absolute;
+      inset:0;
+    }
+    #fsCanvas{
+      width:100%;
+      height:100%;
+      display:block;
+    }
+    .fsControls{
+      position:absolute;
+      left:0; right:0;
+      bottom:0;
+      padding: 14px 14px 18px;
+      background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.72) 45%, rgba(0,0,0,.86));
+      border-top: 1px solid rgba(255,255,255,.10);
+      backdrop-filter: blur(8px);
+    }
+    .fsTop{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom: 10px;
+    }
+    .fsNow{
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: .5px;
+      color: rgba(255,255,255,.92);
+      overflow:hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 72vw;
+    }
+    .fsButtons{
+      display:flex;
+      gap:10px;
+      justify-content:center;
+      flex-wrap:wrap;
+      margin-bottom: 10px;
+    }
+    .fsBtn{
+      padding: 12px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.28);
+      color: rgba(255,255,255,.92);
+      cursor:pointer;
+      font-size: 14px;
+      letter-spacing: .6px;
+      user-select:none;
+    }
+    .fsBtn:hover{ border-color: rgba(245,194,75,.65); }
+    .fsPrimary{
+      border-color: rgba(245,194,75,.85);
+      background: rgba(245,194,75,.14);
+    }
+    .fsSeek{
+      width: min(900px, 92vw);
+      display:block;
+      margin: 0 auto 10px;
+      accent-color: var(--gold);
+    }
+    .fsBottom{
+      display:flex;
+      gap:14px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .fsTime{
+      font-size: 13px;
+      color: rgba(255,255,255,.78);
+      letter-spacing: .4px;
+    }
+    .fsVol{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      color: rgba(255,255,255,.78);
+      font-size: 13px;
+    }
+    .fsVolSlider{
+      width: 180px;
+      accent-color: var(--gold);
+    }
+    .fsVizStrip{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .fsVizBtn.active{
+      border-color: rgba(245,194,75,.85);
+      box-shadow: 0 0 0 3px rgba(245,194,75,.12);
+    }
+
   </style>
 </head>
 
@@ -399,6 +510,52 @@
       Tip: If you prefer browsing by program, tap <b>Listen by Show</b>. For easy “radio-style” listening, tap <b>Listen to Channel</b>.
     </footer>
   </div>
+
+  
+  <!-- Fullscreen Visualizer Overlay -->
+  <div id="fsOverlay" class="fsOverlay" style="display:none;" aria-hidden="true">
+    <div class="fsCanvasWrap">
+      <canvas id="fsCanvas"></canvas>
+    </div>
+
+    <div class="fsControls">
+      <div class="fsTop">
+        <div class="fsNow" id="fsNow">Now Playing</div>
+        <button class="fsBtn" id="fsExitBtn" type="button">Exit Fullscreen</button>
+      </div>
+
+      <div class="fsButtons">
+        <button class="fsBtn" id="fsPrev" type="button">⟵ Prev</button>
+        <button class="fsBtn fsPrimary" id="fsPlay" type="button">Play</button>
+        <button class="fsBtn" id="fsNext" type="button">Next ⟶</button>
+        <button class="fsBtn" id="fsStop" type="button">Stop</button>
+      </div>
+
+      <input class="fsSeek" id="fsSeek" type="range" min="0" max="1000" value="0" />
+
+      <div class="fsBottom">
+        <div class="fsTime">
+          <span id="fsTCur">0:00</span>
+          <span> / </span>
+          <span id="fsTDur">0:00</span>
+        </div>
+
+        <div class="fsVol">
+          <span class="fsVolLabel">Vol</span>
+          <input id="fsVol" class="fsVolSlider" type="range" min="0" max="1" step="0.01" value="0.6" aria-label="Volume" />
+        </div>
+
+        <div class="fsVizStrip" id="fsVizStrip">
+          <button class="fsBtn fsVizBtn active" data-viz="none" type="button">Off</button>
+          <button class="fsBtn fsVizBtn" data-viz="wave" type="button">Wave</button>
+          <button class="fsBtn fsVizBtn" data-viz="bars" type="button">Bars</button>
+          <button class="fsBtn fsVizBtn" data-viz="ring" type="button">Ring</button>
+          <button class="fsBtn fsVizBtn" data-viz="particles" type="button">Particles</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 
   <audio id="audio" preload="none" crossorigin="anonymous"></audio>
 
@@ -618,6 +775,7 @@
 
   function setPlayButton(isPlaying){
     btnPlay.textContent = isPlaying ? "Pause" : "Play";
+    if(typeof fsPlay !== "undefined" && fsPlay) fsPlay.textContent = isPlaying ? "Pause" : "Play";
   }
 
   function updateNowPlayingUI(){
@@ -625,11 +783,13 @@
       const name = (CHANNELS.find(c=>c.id===currentChannelId)?.label) || "Channel";
       nowTitle.textContent = currentQueue[currentIdx]?.displayTitle || currentQueue[currentIdx]?.title || `Channel: ${name}`;
       nowMeta.textContent = `Channel: ${name}`;
+      if(typeof fsNow !== "undefined" && fsNow) fsNow.textContent = nowTitle.textContent;
     }else{
       const showName = currentShowKey ? (showIndex.get(currentShowKey)?.name || "Show") : "Show";
       const t = currentQueue[currentIdx];
       nowTitle.textContent = t ? (t.displayTitle || t.title || "Untitled") : `Show: ${showName}`;
       nowMeta.textContent = `Show mode: ${showName}`;
+      if(typeof fsNow !== "undefined" && fsNow) fsNow.textContent = nowTitle.textContent;
     }
   }
 
@@ -723,6 +883,7 @@
 
   volMain.addEventListener("input", () => {
     audioEl.volume = Number(volMain.value);
+    if(typeof fsVol !== "undefined" && fsVol) fsVol.value = String(audioEl.volume);
   });
 
   audioEl.addEventListener("ended", () => {
@@ -741,10 +902,13 @@
     const cur = audioEl.currentTime || 0;
     tCur.textContent = fmtTime(cur);
     tDur.textContent = fmtTime(dur);
+    if(typeof fsTCur !== "undefined"){ fsTCur.textContent = fmtTime(cur); fsTDur.textContent = fmtTime(dur); }
     if(dur > 0){
       seek.value = String(Math.floor((cur/dur)*1000));
+      if(typeof fsSeek !== "undefined") fsSeek.value = seek.value;
     }else{
       seek.value = "0";
+      if(typeof fsSeek !== "undefined") fsSeek.value = "0";
     }
   });
 
@@ -757,26 +921,117 @@
     }
     userSeeking = false;
   });
-
-  
-  // ---------- fullscreen visualizer ----------
+  // ---------- fullscreen visualizer (canvas fills screen + controls overlay) ----------
   const vizBox = document.querySelector(".viz");
   const vizFullscreenBtn = document.getElementById("vizFullscreenBtn");
+
+  const fsOverlay = document.getElementById("fsOverlay");
+  const fsCanvas = document.getElementById("fsCanvas");
+  const fsExitBtn = document.getElementById("fsExitBtn");
+  const fsNow = document.getElementById("fsNow");
+  const fsPrev = document.getElementById("fsPrev");
+  const fsPlay = document.getElementById("fsPlay");
+  const fsNext = document.getElementById("fsNext");
+  const fsStop = document.getElementById("fsStop");
+  const fsSeek = document.getElementById("fsSeek");
+  const fsTCur = document.getElementById("fsTCur");
+  const fsTDur = document.getElementById("fsTDur");
+  const fsVol = document.getElementById("fsVol");
+  const fsVizStrip = document.getElementById("fsVizStrip");
+
+  let inFullscreen = false;
+
+  function showFs(on){
+    fsOverlay.style.display = on ? "block" : "none";
+    fsOverlay.setAttribute("aria-hidden", on ? "false" : "true");
+    inFullscreen = on;
+    resizeCanvas();
+    resizeFsCanvas();
+  }
+
+  function resizeFsCanvas(){
+    const rect = fsCanvas.getBoundingClientRect();
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    fsCanvas.width = Math.floor(rect.width * dpr);
+    fsCanvas.height = Math.floor(rect.height * dpr);
+    const fsCtx = fsCanvas.getContext("2d");
+    fsCtx.setTransform(dpr,0,0,dpr,0,0);
+  }
+
+  window.addEventListener("resize", () => {
+    if(inFullscreen) resizeFsCanvas();
+  });
 
   vizFullscreenBtn?.addEventListener("click", async () => {
     try{
       if (!document.fullscreenElement) {
-        await vizBox.requestFullscreen();
+        showFs(true);
+        await fsOverlay.requestFullscreen();
       } else {
         await document.exitFullscreen();
       }
     }catch(e){
       console.error("Fullscreen failed:", e);
+      showFs(false);
+    }
+  });
+
+  fsExitBtn?.addEventListener("click", async () => {
+    try{
+      if(document.fullscreenElement) await document.exitFullscreen();
+      else showFs(false);
+    }catch(e){
+      console.error(e);
+      showFs(false);
     }
   });
 
   document.addEventListener("fullscreenchange", () => {
-    resizeCanvas();
+    const on = !!document.fullscreenElement;
+    showFs(on);
+  });
+
+  // Mirror main controls into fullscreen overlay
+  function syncFsButtons(){
+    fsPlay.textContent = audioEl.paused ? "Play" : "Pause";
+    fsVol.value = String(audioEl.volume);
+  }
+
+  function syncFsNow(){
+    // Copy main now-playing line
+    fsNow.textContent = nowTitle.textContent || "Now Playing";
+  }
+
+  fsPrev?.addEventListener("click", () => btnPrev.click());
+  fsNext?.addEventListener("click", () => btnNext.click());
+  fsStop?.addEventListener("click", () => btnStop.click());
+  fsPlay?.addEventListener("click", () => btnPlay.click());
+
+  fsVol?.addEventListener("input", () => {
+    audioEl.volume = Number(fsVol.value);
+    volMain.value = fsVol.value;
+  });
+
+  fsSeek?.addEventListener("input", () => { userSeeking = true; });
+  fsSeek?.addEventListener("change", () => {
+    const dur = audioEl.duration || 0;
+    if(dur > 0){
+      const pct = Number(fsSeek.value)/1000;
+      audioEl.currentTime = dur * pct;
+    }
+    userSeeking = false;
+  });
+
+  fsVizStrip?.querySelectorAll("[data-viz]")?.forEach(btn => {
+    btn.addEventListener("click", () => {
+      fsVizStrip.querySelectorAll("[data-viz]").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      const v = btn.getAttribute("data-viz");
+      // keep both strips in sync
+      vizStrip.querySelectorAll("[data-viz]").forEach(b => b.classList.toggle("active", b.getAttribute("data-viz") === v));
+      setVisualizer(v);
+    });
+  });
   });
 
 
@@ -826,16 +1081,28 @@
 
   function draw(){
     requestAnimationFrame(draw);
-    if(!vctx) return;
-    const w = vizCanvas.getBoundingClientRect().width;
-    const h = vizCanvas.getBoundingClientRect().height;
 
-    // clear
-    vctx.clearRect(0,0,w,h);
+    // draw to normal canvas
+    drawTo(vizCanvas, vctx);
 
-    // background glow
-    vctx.fillStyle = "rgba(0,0,0,.10)";
-    vctx.fillRect(0,0,w,h);
+    // draw to fullscreen canvas if active
+    if(typeof inFullscreen !== "undefined" && inFullscreen){
+      const fsCtx = fsCanvas.getContext("2d");
+      drawTo(fsCanvas, fsCtx);
+    }
+  }
+
+  function drawTo(canvasEl, ctx){
+    if(!ctx || !canvasEl) return;
+    const rect = canvasEl.getBoundingClientRect();
+    const w = rect.width;
+    const h = rect.height;
+
+    ctx.clearRect(0,0,w,h);
+
+    // background
+    ctx.fillStyle = "rgba(0,0,0,.10)";
+    ctx.fillRect(0,0,w,h);
 
     if(vizMode === "none") return;
 
@@ -847,36 +1114,36 @@
     analyser.getByteFrequencyData(dataArr);
 
     if(vizMode === "bars"){
-      const bars = 64;
+      const bars = 72;
       const step = Math.floor(dataArr.length / bars);
       const bw = w / bars;
       for(let i=0;i<bars;i++){
         const v = dataArr[i*step] / 255;
         const bh = v * (h*0.80);
-        vctx.fillStyle = `rgba(245,194,75,${0.15 + v*0.75})`;
-        vctx.fillRect(i*bw, h-bh, bw*0.72, bh);
+        ctx.fillStyle = `rgba(245,194,75,${0.15 + v*0.75})`;
+        ctx.fillRect(i*bw, h-bh, bw*0.70, bh);
       }
     }
 
     if(vizMode === "wave"){
       analyser.getByteTimeDomainData(dataArr);
-      vctx.lineWidth = 2;
-      vctx.strokeStyle = "rgba(245,194,75,.85)";
-      vctx.beginPath();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "rgba(245,194,75,.85)";
+      ctx.beginPath();
       for(let i=0;i<dataArr.length;i++){
         const x = (i/(dataArr.length-1))*w;
         const y = (dataArr[i]/255)*h;
-        if(i===0) vctx.moveTo(x,y);
-        else vctx.lineTo(x,y);
+        if(i===0) ctx.moveTo(x,y);
+        else ctx.lineTo(x,y);
       }
-      vctx.stroke();
+      ctx.stroke();
     }
 
     if(vizMode === "ring"){
       const cx = w/2, cy = h/2;
       const radius = Math.min(w,h)*0.22;
-      const points = 120;
-      vctx.beginPath();
+      const points = 140;
+      ctx.beginPath();
       for(let i=0;i<points;i++){
         const idx = Math.floor(i*(dataArr.length/points));
         const amp = (dataArr[idx]/255) * (Math.min(w,h)*0.12);
@@ -884,21 +1151,20 @@
         const r = radius + amp;
         const x = cx + Math.cos(a)*r;
         const y = cy + Math.sin(a)*r;
-        if(i===0) vctx.moveTo(x,y);
-        else vctx.lineTo(x,y);
+        if(i===0) ctx.moveTo(x,y);
+        else ctx.lineTo(x,y);
       }
-      vctx.closePath();
-      vctx.strokeStyle = "rgba(245,194,75,.85)";
-      vctx.lineWidth = 2;
-      vctx.stroke();
-      vctx.fillStyle = "rgba(245,194,75,.10)";
-      vctx.fill();
+      ctx.closePath();
+      ctx.strokeStyle = "rgba(245,194,75,.85)";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.fillStyle = "rgba(245,194,75,.10)";
+      ctx.fill();
     }
 
     if(vizMode === "particles"){
-      // init
-      if(particles.length < 80){
-        particles = Array.from({length:80}, () => ({
+      if(particles.length < 110){
+        particles = Array.from({length:110}, () => ({
           x: Math.random()*w,
           y: Math.random()*h,
           vx: (Math.random()-.5)*0.7,
@@ -914,10 +1180,10 @@
         if(p.x>w) p.x=0;
         if(p.y<0) p.y=h;
         if(p.y>h) p.y=0;
-        vctx.beginPath();
-        vctx.fillStyle = `rgba(245,194,75,${0.10 + energy*0.75})`;
-        vctx.arc(p.x,p.y,p.r*(1+energy*1.7),0,Math.PI*2);
-        vctx.fill();
+        ctx.beginPath();
+        ctx.fillStyle = `rgba(245,194,75,${0.10 + energy*0.75})`;
+        ctx.arc(p.x,p.y,p.r*(1+energy*1.7),0,Math.PI*2);
+        ctx.fill();
       }
     }
   }
