@@ -741,6 +741,31 @@ body.compact .volMain{ height: 120px; }
   .episodeBox{ max-height: 40vh; }
 }
 
+
+.modePills{
+  display:flex;
+  justify-content:center;
+  gap:14px;
+  margin: 12px auto 6px;
+  flex-wrap:wrap;
+}
+.pillBtn{
+  padding: 12px 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.16);
+  background: radial-gradient(circle at 30% 20%, rgba(255,255,255,.18), rgba(0,0,0,.38) 55%, rgba(0,0,0,.55));
+  color: rgba(255,255,255,.92);
+  cursor:pointer;
+  font-size: 14px;
+  letter-spacing: .8px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.10), 0 8px 24px rgba(0,0,0,.35);
+}
+.pillBtn:hover{ border-color: rgba(245,194,75,.55); }
+.pillBtn.active{
+  border-color: rgba(245,194,75,.85);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.10), 0 0 0 3px rgba(245,194,75,.12), 0 10px 30px rgba(0,0,0,.40);
+}
+
 </style>
 </head>
 
@@ -1077,6 +1102,8 @@ const btnModeShow = document.getElementById("btnModeShow");
 const showPickerPanel = document.getElementById("showPickerPanel");
 const showSelectInline = document.getElementById("showSelectInline");
 const vizStrip = document.getElementById("vizStrip");
+const pillChannel = document.getElementById("pillChannel");
+const pillShow = document.getElementById("pillShow");
 const episodeBox = document.getElementById("episodeBox");
 const browsePanel = document.getElementById("browsePanel");
 
@@ -1845,6 +1872,9 @@ function setModeFromUI(newMode){
   btnModeChannel?.classList.toggle("active", mode === "channel");
   btnModeShow?.classList.toggle("active", mode === "show");
 
+  pillChannel?.classList.toggle("active", mode === "channel");
+  pillShow?.classList.toggle("active", mode === "show");
+
   // Channel buttons only in Channel mode
   safeShow(dockEl, mode === "channel");
   // Show dropdown only in Show mode
@@ -1870,6 +1900,17 @@ vizStrip?.querySelectorAll("[data-viz]")?.forEach(btn => {
     btn.classList.add("active");
     setVisualizer(v);
   });
+
+
+pillChannel?.addEventListener("click", () => {
+  setModeFromUI("channel");
+});
+
+pillShow?.addEventListener("click", () => {
+  setModeFromUI("show");
+});
+
+
 });
 
 showSelectInline?.addEventListener("change", () => {
