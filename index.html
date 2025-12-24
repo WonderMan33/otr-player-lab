@@ -1375,15 +1375,15 @@ audioEl.addEventListener("ended", () => {
 showSelectInline?.addEventListener("change", () => {
   const v = showSelectInline.value;
   if (v === "__all__" || !v) return;
+
   currentShow = v;
   showTracks = buildShowTracks(currentShow);
   renderEpisodes();
+
+  // Stay in show mode and start only after selection
   setModeFromUI("show");
   playShowIndex(0, true);
 });
-
-
-
 function openModal(){ overlayEl.classList.add("open"); }
 function closeModal(){ overlayEl.classList.remove("open"); }
 
@@ -1841,22 +1841,27 @@ document.querySelectorAll("#vizRow .pill").forEach(p => {
 
 function setModeFromUI(newMode){
   mode = newMode;
+
+  const dockEl = document.getElementById("dock");
+  // Buttons state
   btnModeChannel?.classList.toggle("active", mode === "channel");
   btnModeShow?.classList.toggle("active", mode === "show");
-  safeShow(showPickerPanel, mode === "show");
+
+  // Show/hide primary controls
+  safeShow(dockEl, mode === "channel");          // channel buttons only in channel mode
+  safeShow(showPickerPanel, mode === "show");    // show dropdown only in show mode
+
   setModeUI();
 }
 
 btnModeChannel?.addEventListener("click", () => {
   setModeFromUI("channel");
-  // resume channel playback if user had switched modes
-  if (currentChannel) switchChannel(currentChannel, false);
+  // No forced autoplay; just keep current state.
 });
-
 btnModeShow?.addEventListener("click", () => {
   setModeFromUI("show");
+  // No autoplay. User must pick a show.
 });
-
 // Visualizer buttons on main page
 vizStrip?.querySelectorAll("[data-viz]")?.forEach(btn => {
   btn.addEventListener("click", () => {
