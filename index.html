@@ -831,6 +831,9 @@ const SHOW_TO_CHANNEL = {};
    STATE
 ========================= */
 let allTracks = [];
+let tracksByChannel = {};
+let showsList = [];
+
 let mode = "channel";            // "channel" or "show"
 let currentChannel = "Suspense";
 let channelQueue = [];
@@ -1068,10 +1071,7 @@ function setModeUI(){
    CHANNEL MODE
 ========================= */
 function buildChannelQueue(channel){
-  const base = allTracks
-    .map(t => ({...t, channel: inferredChannel(t)}))
-    .filter(t => t.channel === channel);
-
+  const base = tracksByChannel[channel] || [];
   const filtered = applySearch(base, searchQuery);
   return shuffle(filtered);
 }
@@ -1139,7 +1139,7 @@ if (channelQueue.length){
    SHOW MODE
 ========================= */
 function renderShowSelect(){
-  const shows = uniqueShows(allTracks);
+  const shows = showsList;
   showSelect.innerHTML = `<option value="__all__">Select a show…</option>`;
   for (const show of shows){
     const opt = document.createElement("option");
@@ -1736,6 +1736,9 @@ async function init(){
   renderModalChannels();
   setVolume(0.6);
   setVisualizer("none");
+  trackTitleEl.textContent = "Loading library…";
+  metaLineEl.textContent = "—";
+  statusHintEl.textContent = "Fetching shows.json…";
 
   // Robust JSON loading for GitHub Pages + local testing
   const path = window.location.pathname || "/";
@@ -1774,8 +1777,22 @@ async function init(){
 
     if (!data) throw lastErr || new Error("Could not load JSON from any candidate URL.");
 
-    allTracks = data;
+    statusHintEl.textContent = "Indexing library…";
+
+    // Precompute channel + indexes ONCE for speed
+    allTracks = data.map(t => ({...t, channel: inferredChannel(t)}));
     console.log("Loaded tracks:", allTracks.length, "from", loadedFrom);
+
+    tracksByChannel = {};
+    for (const ch of CHANNELS) tracksByChannel[ch] = [];
+    for (const t of allTracks){
+      const ch = t.channel && CHANNELS.includes(t.channel) ? t.channel : "Drama";
+      tracksByChannel[ch].push(t);
+    }
+
+    const showSet = new Set();
+    for (const t of allTracks) showSet.add(t.show || "Unknown");
+    showsList = [...showSet].sort((a,b)=>a.localeCompare(b));
 
     // Diagnostic line (helps confirm path without opening DevTools)
     metaLineEl.textContent = `Data source: ${loadedFrom} • Tracks: ${allTracks.length}`;
@@ -1783,6 +1800,9 @@ async function init(){
     renderShowSelect();
     switchChannel(currentChannel, false);
     setActiveDock();
+
+    statusHintEl.textContent = "Ready.";
+
 
   }catch(err){
     console.error("JSON load error:", err);
