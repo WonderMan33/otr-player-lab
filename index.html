@@ -636,7 +636,63 @@ body.compact .playerBar{ padding: 8px 0 0; }
       color: rgba(255,255,255,.62);
     }
 
-  </style>
+  
+.playerRow{
+  display:flex;
+  align-items:flex-end;
+  gap:12px;
+}
+.volRail{
+  width: 48px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding: 6px 0 0;
+}
+.volMain{
+  height: 140px;
+  width: 28px;
+  writing-mode: bt-lr;          /* Firefox */
+  -webkit-appearance: slider-vertical; /* WebKit */
+}
+body.compact .volMain{ height: 110px; }
+
+
+.modeStrip{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin: 12px 0 0;
+}
+.modeBtn{
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(0,0,0,.22);
+  color: rgba(255,255,255,.92);
+  cursor:pointer;
+  font-size: 14px;
+  letter-spacing: .6px;
+}
+.modeBtn:hover{ border-color: rgba(245,194,75,.55); }
+.modeBtn.active{
+  border-color: rgba(245,194,75,.75);
+  box-shadow: 0 0 0 2px rgba(245,194,75,.15);
+}
+
+
+.showPanelMain{
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(0,0,0,.16);
+}
+.showPanelMain .select{
+  width: 100%;
+}
+
+</style>
 </head>
 
 <body>
@@ -654,6 +710,14 @@ body.compact .playerBar{ padding: 8px 0 0; }
 
         <div class="brand">
           <div class="logo" title="Golden Radio Hour" aria-hidden="true"></div>
+<div class="showPanelMain" id="showPanelMain" style="display:none;">
+  <div class="row">
+    <select id="showSelectMain" class="select">
+      <option value="__all__">Select a show…</option>
+    </select>
+  </div>
+  <div class="smallNote">Pick a show, then use Prev/Next to skip episodes.</div>
+</div>
           <div class="titleWrap">
             <div class="title">Old Time Radio Archive — Hosted by Golden Radio Hour</div>
             <div class="subtitle" id="modeSubtitle">Mode: Channel Radio</div>
@@ -736,8 +800,7 @@ body.compact .playerBar{ padding: 8px 0 0; }
               <option value="__all__">Select a show…</option>
             </select>
 
-            <input id="showSearch" type="text" placeholder="Filter episodes in this show..." />
-          </div>
+            </div>
 
           <div class="episodeBox" id="episodeBox"></div>
         
@@ -845,6 +908,14 @@ let showTracks = [];
 let currentKey = null;
 
 const audioEl = document.getElementById("audio");
+
+const volMain = document.getElementById("volMain");
+volMain?.addEventListener("input", () => {
+  audioEl.volume = Number(volMain.value);
+});
+function syncVolMain(){
+  if (volMain) volMain.value = String(audioEl.volume);
+}
 
 const btnPrev = document.getElementById("btnPrev");
 const btnPlay = document.getElementById("btnPlay");
@@ -964,7 +1035,10 @@ const channelSection = document.getElementById("channelSection");
 const showSection = document.getElementById("showSection");
 
 const showSelect = document.getElementById("showSelect");
-const showSearch = document.getElementById("showSearch");
+const btnModeChannel = document.getElementById("btnModeChannel");
+const btnModeShow = document.getElementById("btnModeShow");
+const showPanelMain = document.getElementById("showPanelMain");
+const showSelectMain = document.getElementById("showSelectMain");
 const episodeBox = document.getElementById("episodeBox");
 const browsePanel = document.getElementById("browsePanel");
 
@@ -1143,11 +1217,13 @@ if (channelQueue.length){
 function renderShowSelect(){
   const shows = showsList;
   showSelect.innerHTML = `<option value="__all__">Select a show…</option>`;
+  if (showSelectMain) showSelectMain.innerHTML = `<option value="__all__">Select a show…</option>`;
   for (const show of shows){
     const opt = document.createElement("option");
     opt.value = show;
     opt.textContent = show;
     showSelect.appendChild(opt);
+    if (showSelectMain) showSelectMain.appendChild(opt.cloneNode(true));
   }
 }
 
@@ -1189,55 +1265,30 @@ function playShowIndex(i, autoplay=true){
 
 function renderEpisodes(){
   episodeBox.innerHTML = "";
-  if (!currentShow){
-    episodeBox.innerHTML = `<div style="padding:12px;color:rgba(255,255,255,.70)">Pick a show to see episodes.</div>`;
+  if (!currentShow) return;
+
+  const list = showTracks.slice(); // no filtering
+  if (!list.length){
+    episodeBox.innerHTML = `<div class="smallNote">No episodes found for this show.</div>`;
     return;
   }
 
-  const q = showSearch.value || "";
-  const filtered = applySearch(showTracks, q);
-
-  if (!filtered.length){
-    episodeBox.innerHTML = `<div style="padding:12px;color:rgba(255,255,255,.70)">No matching episodes.</div>`;
-    return;
-  }
-
-  filtered.forEach((t) => {
+  list.forEach((t) => {
     const idx = showTracks.indexOf(t);
     const key = `show|${currentShow}|${idx}`;
 
-    const row = document.createElement("div");
-    row.className = "epRow";
-    row.dataset.key = key;
+    const div = document.createElement("div");
+    div.className = "ep" + (key === currentKey ? " active" : "");
+    div.innerHTML = `<div class="epTitle">${escapeHtml(t.title || "Untitled")}</div>
+      <div class="epMeta">${escapeHtml(t.date || "")}</div>`;
 
-    const left = document.createElement("div");
-    left.className = "epLeft";
-    left.textContent = titleOf(t);
-
-    const right = document.createElement("div");
-    right.className = "epRight";
-    right.textContent = formatTime(t.durationSeconds);
-
-    row.appendChild(left);
-    row.appendChild(right);
-
-    row.addEventListener("click", () => {
-      mode = "show";
-      setModeUI();
-
-      currentKey = key;
-      audioEl.src = t.url;
-      renderNowPlaying(t);
-      statusHintEl.textContent = `Show: ${currentShow} • ${filtered.length} episode(s) listed • Use channel dock for radio mode`;
-      setActiveEpisode(key);
-
-      audioEl.play().catch(()=>{});
+    div.addEventListener("click", () => {
+      playShowIndex(idx, true);
+      closeMenu();
     });
 
-    episodeBox.appendChild(row);
+    episodeBox.appendChild(div);
   });
-
-  if (currentKey && currentKey.startsWith("show|")) setActiveEpisode(currentKey);
 }
 
 function enterShowMode(){
@@ -1261,9 +1312,6 @@ showSelect.addEventListener("change", () => {
   renderNowPlaying(showTracks[0] || null);
 });
 
-showSearch.addEventListener("input", renderEpisodes);
-
-
 /* =========================
    UI WIRING
 ========================= */
@@ -1277,6 +1325,26 @@ audioEl.addEventListener("ended", () => {
   }
   loadChannelIndex(channelIndex, true);
 });
+
+
+showSelectMain?.addEventListener("change", () => {
+  const v = showSelectMain.value;
+  if (v === "__all__" || !v){
+    currentShow = null;
+    showTracks = [];
+    episodeBox.innerHTML = "";
+    return;
+  }
+  currentShow = v;
+  showTracks = buildShowTracks(currentShow);
+  renderEpisodes();
+  // Switch to show mode automatically
+  setModeFromUI("show");
+  // Play first episode immediately (older users expect it)
+  playShowIndex(0, true);
+});
+
+
 
 function openModal(){ overlayEl.classList.add("open"); }
 function closeModal(){ overlayEl.classList.remove("open"); }
@@ -1732,11 +1800,32 @@ document.querySelectorAll("#vizRow .pill").forEach(p => {
 /* =========================
    INIT
 ========================= */
+
+function setModeFromUI(newMode){
+  mode = newMode;
+  // Toggle buttons
+  if (btnModeChannel) btnModeChannel.classList.toggle("active", mode === "channel");
+  if (btnModeShow) btnModeShow.classList.toggle("active", mode === "show");
+  // Toggle main show panel visibility
+  safeShow(showPanelMain, mode === "show");
+  setModeUI();
+}
+
+btnModeChannel?.addEventListener("click", () => {
+  setModeFromUI("channel");
+});
+
+btnModeShow?.addEventListener("click", () => {
+  setModeFromUI("show");
+});
+
+
 async function init(){
   setModeUI();
   renderDock();
   renderModalChannels();
   setVolume(0.6);
+  if (typeof syncVolMain === "function") syncVolMain();
   setVisualizer("none");
   trackTitleEl.textContent = "Loading library…";
   metaLineEl.textContent = "—";
