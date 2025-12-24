@@ -727,6 +727,20 @@ body.compact .volMain{ height: 120px; }
   }
 }
 
+
+/* Episode list should be scrollable, not page-filling */
+.episodeBox{
+  max-height: 320px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 6px;
+  border-top: 1px solid rgba(255,255,255,.08);
+  margin-top: 10px;
+}
+@media (max-width: 520px){
+  .episodeBox{ max-height: 40vh; }
+}
+
 </style>
 </head>
 
@@ -1336,6 +1350,7 @@ function enterShowMode(){
 }
 
 showSelect.addEventListener("change", () => {
+  setModeFromUI("show");
   const v = showSelect.value;
   if (v === "__all__"){
     currentShow = null;
