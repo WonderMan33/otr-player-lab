@@ -1736,31 +1736,73 @@ async function init(){
   renderModalChannels();
   setVolume(0.6);
   setVisualizer("none");
-  syncPlayIcon();
+
+  // Robust JSON loading for GitHub Pages + local testing
+  const path = window.location.pathname || "/";
+  const parts = path.split("/").filter(Boolean);
+  const repoBase = parts.length ? `/${parts[0]}/` : "/";
+
+  const candidates = [
+    "./shows.json",
+    "shows.json",
+    repoBase + "shows.json"
+  ];
+
+  async function tryLoad(url){
+    console.log("Trying JSON:", url);
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) throw new Error(`Fetch failed: ${res.status} ${res.statusText}`);
+    const data = await res.json();
+    if (!Array.isArray(data)) throw new Error("JSON loaded but it is not an array.");
+    return data;
+  }
 
   try{
-    console.log("Loading JSON:", DATA_URL);
-    const res = await fetch(DATA_URL, { cache: "no-store" });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    if (!Array.isArray(data)) throw new Error("shows.json must be a JSON array of tracks.");
+    let loadedFrom = null;
+    let data = null;
+    let lastErr = null;
+
+    for (const url of candidates){
+      try{
+        data = await tryLoad(url);
+        loadedFrom = url;
+        break;
+      }catch(e){
+        lastErr = e;
+      }
+    }
+
+    if (!data) throw lastErr || new Error("Could not load JSON from any candidate URL.");
 
     allTracks = data;
-    console.log("Loaded tracks:", allTracks.length);
+    console.log("Loaded tracks:", allTracks.length, "from", loadedFrom);
+
+    // Diagnostic line (helps confirm path without opening DevTools)
+    metaLineEl.textContent = `Data source: ${loadedFrom} • Tracks: ${allTracks.length}`;
 
     renderShowSelect();
-
     switchChannel(currentChannel, false);
     setActiveDock();
 
   }catch(err){
+    console.error("JSON load error:", err);
+
     trackTitleEl.textContent = "Couldn’t load shows.json";
     metaLineEl.textContent = String(err?.message || err);
-    statusHintEl.textContent = "Fix: ensure shows.json is in the same folder as index.html and valid JSON.";
+
+    const links = candidates.map(u => {
+      const href = new URL(u, window.location.href).toString();
+      return `<a href="${href}" target="_blank" style="color:rgba(245,194,75,.95);text-decoration:underline">${u}</a>`;
+    }).join(" • ");
+
+    statusHintEl.innerHTML =
+      `Fix: make sure <b>shows.json</b> is committed to the same folder as <b>index.html</b> in this GitHub Pages repo.<br>` +
+      `Try opening: ${links}`;
   }
 }
 
 init();
+
 </script>
 </body>
 </html>
