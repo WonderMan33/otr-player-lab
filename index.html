@@ -746,7 +746,7 @@ body.compact .volMain{ height: 120px; }
   display:flex;
   justify-content:center;
   gap:14px;
-  margin: 12px auto 6px;
+  margin: 12px auto 10px;
   flex-wrap:wrap;
 }
 .pillBtn{
@@ -764,6 +764,62 @@ body.compact .volMain{ height: 120px; }
 .pillBtn.active{
   border-color: rgba(245,194,75,.85);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.10), 0 0 0 3px rgba(245,194,75,.12), 0 10px 30px rgba(0,0,0,.40);
+}
+
+.showPickerPanel{
+  margin: 6px auto 0;
+  padding: 10px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(0,0,0,.14);
+  max-width: 520px;
+}
+#showSelectInline{
+  max-width: 420px;
+  width: 100%;
+  font-size: 14px;
+  padding: 10px 12px;
+}
+
+.vizStrip{
+  display:flex;
+  justify-content:center;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(0,0,0,.14);
+}
+.vizBtn{
+  padding: 10px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(0,0,0,.18);
+  color: rgba(255,255,255,.90);
+  cursor:pointer;
+  font-size: 13px;
+}
+.vizBtn.active{ border-color: rgba(245,194,75,.80); }
+
+.playerRow{
+  display:flex;
+  align-items:flex-end;
+  gap:12px;
+}
+.volRail{
+  width: 52px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding-top: 6px;
+}
+.volMain{
+  height: 150px;
+  width: 28px;
+  writing-mode: vertical-lr;
+  direction: rtl;
 }
 
 </style>
@@ -868,7 +924,7 @@ body.compact .volMain{ height: 120px; }
 
             </div>
 
-          <div class="episodeBox" id="episodeBox"></div>
+          <div class="episodeBox" id="episodeBox" class="episodeBox"></div>
         
     </section>
 
@@ -1097,11 +1153,16 @@ const channelSection = document.getElementById("channelSection");
 const showSection = document.getElementById("showSection");
 
 const showSelect = document.getElementById("showSelect");
+const pillListenChannel = document.getElementById("pillListenChannel");
+const pillListenShow = document.getElementById("pillListenShow");
 const showPickerPanel = document.getElementById("showPickerPanel");
 const showSelectInline = document.getElementById("showSelectInline");
 const vizStrip = document.getElementById("vizStrip");
-const pillListenChannel = document.getElementById("pillListenChannel");
-const pillListenShow = document.getElementById("pillListenShow");
+const btnModeChannel = document.getElementById("btnModeChannel");
+const btnModeShow = document.getElementById("btnModeShow");
+const showPickerPanel = document.getElementById("showPickerPanel");
+const showSelectInline = document.getElementById("showSelectInline");
+const vizStrip = document.getElementById("vizStrip");
 const episodeBox = document.getElementById("episodeBox");
 const browsePanel = document.getElementById("browsePanel");
 
@@ -1281,11 +1342,13 @@ function renderShowSelect(){
   const shows = showsList;
   showSelect.innerHTML = `<option value="__all__">Select a show…</option>`;
   if (showSelectInline) showSelectInline.innerHTML = `<option value="__all__">Select a show…</option>`;
+  if (showSelectInline) showSelectInline.innerHTML = `<option value="__all__">Select a show…</option>`;
   for (const show of shows){
     const opt = document.createElement("option");
     opt.value = show;
     opt.textContent = show;
     showSelect.appendChild(opt);
+    if (showSelectInline) showSelectInline.appendChild(opt.cloneNode(true));
     if (showSelectInline) showSelectInline.appendChild(opt.cloneNode(true));
   }
 }
@@ -1455,9 +1518,9 @@ document.querySelectorAll("#modeRow .pill").forEach(p => {
 ========================= */
 const VOL_STEPS = 10;
 function setVolume(v){
-  v = Math.max(0, Math.min(1, v));
-  audioEl.volume = v;
-  renderVolDots();
+  audioEl.volume = clamp(v, 0, 1);
+  volSlider.value = String(audioEl.volume);
+  syncVolMain();
 }
 function renderVolDots(){
   volDotsEl.innerHTML = "";
@@ -1860,44 +1923,30 @@ document.querySelectorAll("#vizRow .pill").forEach(p => {
 ========================= */
 
 function getDockEl(){
-  return document.querySelector("nav.dock") || document.querySelector(".dock");
-}
-function getBrowsePanelEl(){
-  // browsePanel is the show mode panel that contains show dropdown and episode list
-  return document.getElementById("browsePanel") || document.getElementById("showPickerPanel");
+  return document.getElementById("dock") || document.getElementById("dockWrap") || document.querySelector(".dock");
 }
 
 function setModeFromUI(newMode){
   mode = newMode;
   const dockEl = getDockEl();
-  const browseEl = getBrowsePanelEl();
 
-  // Root pills are the authority
-  pillListenChannel?.classList.toggle("active", mode === "channel");
-  pillListenShow?.classList.toggle("active", mode === "show");
+  btnModeChannel?.classList.toggle("active", mode === "channel");
+  btnModeShow?.classList.toggle("active", mode === "show");
 
   // Channel buttons only in Channel mode
   safeShow(dockEl, mode === "channel");
-  // Show controls only in Show mode
-  safeShow(browseEl, mode === "show");
+  // Show dropdown only in Show mode
+  safeShow(showPickerPanel, mode === "show");
 
   setModeUI();
 }
 
-
-pillListenChannel?.addEventListener("click", () => {
+btnModeChannel?.addEventListener("click", () => {
   setModeFromUI("channel");
 });
 
-pillListenShow?.addEventListener("click", () => {
+btnModeShow?.addEventListener("click", () => {
   setModeFromUI("show");
-  // No autoplay — wait until a show is selected.
-});
-
-
-
-});
-
   // No autoplay — wait for show selection
 });
 
@@ -1909,17 +1958,6 @@ vizStrip?.querySelectorAll("[data-viz]")?.forEach(btn => {
     btn.classList.add("active");
     setVisualizer(v);
   });
-
-
-pillChannel?.addEventListener("click", () => {
-  setModeFromUI("channel");
-});
-
-pillShow?.addEventListener("click", () => {
-  setModeFromUI("show");
-});
-
-
 });
 
 showSelectInline?.addEventListener("change", () => {
@@ -1938,8 +1976,10 @@ async function init(){
   setModeUI();
   renderDock();
   setModeFromUI("channel");
+  setModeFromUI("channel");
   renderModalChannels();
   setVolume(0.6);
+  syncVolMain();
   syncVolMain();
   setVisualizer("none");
   trackTitleEl.textContent = "Loading library…";
