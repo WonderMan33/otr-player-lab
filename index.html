@@ -1,0 +1,1040 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Old Time Radio – Channel Player (Lab)</title>
+
+  <style>
+    :root{
+      --bg:#070707;
+      --panel:#0f0f0f;
+      --panel2:#141414;
+      --line:rgba(255,255,255,.10);
+      --text:#f2f2f2;
+      --muted:rgba(255,255,255,.70);
+      --muted2:rgba(255,255,255,.55);
+      --glow:rgba(255,255,255,.85);
+      --accent:#f5c24b;
+      --accent2:#d7a53a;
+      --shadow:rgba(0,0,0,.6);
+      --radius:18px;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background:
+        radial-gradient(900px 450px at 20% -10%, rgba(245,194,75,.10), transparent 55%),
+        radial-gradient(900px 450px at 90% 0%, rgba(245,194,75,.06), transparent 55%),
+        radial-gradient(1200px 800px at 50% 120%, rgba(255,255,255,.06), transparent 55%),
+        var(--bg);
+      color:var(--text);
+      overflow-x:hidden;
+    }
+
+    /* Art-deco-ish headline vibe */
+    .deco{
+      letter-spacing:.5px;
+      text-transform: none;
+      font-weight: 500;
+      font-size: 34px;
+      color: rgba(255,255,255,.92);
+      text-shadow:
+        0 0 12px rgba(255,255,255,.20),
+        0 0 26px rgba(255,255,255,.10);
+    }
+    .decoSmall{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      letter-spacing: 1px;
+      font-size: 12px;
+      color: rgba(255,255,255,.70);
+    }
+
+    .app{
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 14px 12px 26px;
+    }
+
+    /* Top bar */
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      padding: 14px 14px;
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.25));
+      box-shadow: 0 18px 55px rgba(0,0,0,.55);
+      position: sticky;
+      top: 10px;
+      z-index: 10;
+      backdrop-filter: blur(8px);
+    }
+    .topLeft, .topRight{
+      display:flex;
+      align-items:center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .iconBtn{
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      border:1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.30));
+      color: var(--text);
+      display:grid;
+      place-items:center;
+      cursor:pointer;
+      user-select:none;
+      box-shadow:
+        inset 0 1px 2px rgba(255,255,255,.10),
+        0 10px 22px rgba(0,0,0,.45);
+    }
+    .iconBtn:hover{ border-color: rgba(245,194,75,.55); }
+    .iconBtn:active{ transform: translateY(1px); }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap: 12px;
+      min-width:0;
+    }
+    .logo{
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      border:1px solid rgba(0,0,0,.55);
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255,255,255,.22), transparent 55%),
+        linear-gradient(145deg, var(--accent), #9c7730);
+      display:grid;
+      place-items:center;
+      overflow:hidden;
+      flex: 0 0 auto;
+      box-shadow:
+        inset 0 1px 2px rgba(255,255,255,.28),
+        inset 0 -2px 4px rgba(0,0,0,.45),
+        0 10px 20px rgba(0,0,0,.55);
+    }
+    .logo img{
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 6px;
+      filter: drop-shadow(0 1px 1px rgba(0,0,0,.55));
+    }
+    .titleWrap{ min-width:0; }
+    .title{
+      margin:0;
+      font-weight: 650;
+      letter-spacing:.6px;
+      font-size: 28px;
+      color: rgba(255,255,255,.95);
+      text-shadow: 0 0 14px rgba(255,255,255,.20);
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Stage */
+    .stage{
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background:
+        radial-gradient(900px 320px at 50% 0%, rgba(255,255,255,.05), transparent 58%),
+        rgba(0,0,0,.45);
+      box-shadow: 0 22px 70px rgba(0,0,0,.60);
+      overflow:hidden;
+    }
+
+    .stageInner{
+      padding: 20px 16px 14px;
+      min-height: 330px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      text-align:center;
+      position: relative;
+    }
+
+    /* star specks */
+    .specks{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background-image:
+        radial-gradient(circle, rgba(255,255,255,.85) 1px, transparent 2px),
+        radial-gradient(circle, rgba(255,255,255,.55) 1px, transparent 2px),
+        radial-gradient(circle, rgba(255,255,255,.35) 1px, transparent 2px);
+      background-size: 220px 220px, 280px 280px, 340px 340px;
+      background-position: 20px 30px, 120px 80px, 40px 140px;
+      opacity: .22;
+      filter: blur(.1px);
+    }
+
+    .stageTopNote{
+      margin:0 0 10px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-size: 12px;
+      color: rgba(255,255,255,.70);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    .nowLine{
+      margin: 0 0 12px;
+      font-size: 22px;
+      color: rgba(255,255,255,.82);
+      text-shadow: 0 0 16px rgba(255,255,255,.10);
+      line-height: 1.2;
+    }
+    .nowLine strong{
+      font-weight: 650;
+      color: rgba(255,255,255,.95);
+    }
+
+    .dividerSwirl{
+      width: 220px;
+      height: 20px;
+      margin: 8px 0 14px;
+      opacity: .9;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,.55));
+    }
+
+    .trackTitle{
+      font-size: 26px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 500;
+      color: rgba(255,255,255,.88);
+      text-shadow: 0 0 18px rgba(255,255,255,.14);
+      margin: 0 0 12px;
+      max-width: 880px;
+      padding: 0 12px;
+      word-break: break-word;
+    }
+
+    .metaLine{
+      font-size: 12px;
+      color: rgba(255,255,255,.70);
+      margin: 0 0 12px;
+      letter-spacing: .3px;
+    }
+
+    .audioWrap{
+      width: min(820px, 100%);
+      padding: 10px 12px 6px;
+      border-top: 1px solid rgba(255,255,255,.08);
+      margin-top: 8px;
+    }
+    audio{ width:100%; }
+
+    /* Bottom channel dock */
+    .dock{
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(0,0,0,.40));
+      box-shadow: 0 18px 60px rgba(0,0,0,.55);
+      padding: 12px 10px 10px;
+      overflow-x: auto;
+      scrollbar-width: thin;
+    }
+    .dockRow{
+      display:flex;
+      align-items:flex-end;
+      gap: 10px;
+      min-width: max-content;
+      padding-bottom: 2px;
+    }
+    .chanTile{
+      width: 86px;
+      flex: 0 0 auto;
+      cursor:pointer;
+      user-select:none;
+      text-align:center;
+      color: rgba(255,255,255,.86);
+    }
+    .chanOrb{
+      width: 52px;
+      height: 52px;
+      margin: 0 auto 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.16);
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255,255,255,.30), transparent 55%),
+        radial-gradient(circle at 50% 65%, rgba(255,255,255,.12), transparent 55%),
+        linear-gradient(180deg, rgba(255,255,255,.08), rgba(0,0,0,.55));
+      box-shadow:
+        inset 0 1px 2px rgba(255,255,255,.14),
+        inset 0 -3px 6px rgba(0,0,0,.55),
+        0 10px 24px rgba(0,0,0,.55);
+      transition: transform 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+    }
+    .chanLabel{
+      font-size: 14px;
+      letter-spacing:.2px;
+      text-shadow: 0 0 10px rgba(255,255,255,.12);
+      white-space:nowrap;
+    }
+    .chanTile:hover .chanOrb{ border-color: rgba(245,194,75,.55); }
+    .chanTile:active .chanOrb{ transform: translateY(1px); }
+    .chanTile.active .chanOrb{
+      border-color: rgba(245,194,75,.85);
+      box-shadow:
+        inset 0 1px 2px rgba(255,255,255,.18),
+        inset 0 -3px 6px rgba(0,0,0,.55),
+        0 0 0 2px rgba(245,194,75,.25),
+        0 14px 30px rgba(0,0,0,.60);
+    }
+    .chanTile.active .chanLabel{
+      color: rgba(255,255,255,.96);
+      text-shadow: 0 0 12px rgba(245,194,75,.20);
+    }
+
+    /* Modal */
+    .overlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.65);
+      display:none;
+      z-index: 50;
+      padding: 22px 12px;
+    }
+    .overlay.open{ display:block; }
+
+    .modal{
+      max-width: 860px;
+      margin: 0 auto;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,.14);
+      background:
+        radial-gradient(900px 320px at 50% 0%, rgba(255,255,255,.08), transparent 58%),
+        rgba(18,18,18,.92);
+      box-shadow: 0 28px 90px rgba(0,0,0,.75);
+      overflow:hidden;
+      position: relative;
+    }
+
+    .modalTop{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.25));
+    }
+    .modalTitle{
+      font-weight: 700;
+      letter-spacing:.4px;
+      color: rgba(255,255,255,.92);
+    }
+    .closeBtn{
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.25);
+      cursor:pointer;
+      color: rgba(255,255,255,.9);
+      display:grid;
+      place-items:center;
+    }
+    .closeBtn:hover{ border-color: rgba(245,194,75,.55); }
+
+    .modalBody{
+      padding: 14px;
+      max-height: calc(100vh - 120px);
+      overflow:auto;
+    }
+
+    .section{
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 16px;
+      background: rgba(255,255,255,.03);
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .section h3{
+      margin:0 0 8px;
+      font-size: 16px;
+      letter-spacing:.2px;
+      color: rgba(255,255,255,.92);
+      text-decoration: underline;
+      text-underline-offset: 4px;
+      text-decoration-thickness: 2px;
+    }
+    .section p{
+      margin: 0 0 10px;
+      font-size: 13px;
+      color: rgba(255,255,255,.72);
+    }
+
+    .pillRow{
+      display:flex;
+      flex-wrap:wrap;
+      gap: 8px;
+    }
+    .pill{
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.18);
+      cursor:pointer;
+      color: rgba(255,255,255,.86);
+      font-size: 13px;
+      user-select:none;
+    }
+    .pill:hover{ border-color: rgba(245,194,75,.55); }
+    .pill.active{
+      border-color: rgba(245,194,75,.85);
+      box-shadow: 0 0 0 2px rgba(245,194,75,.20) inset;
+      color: rgba(255,255,255,.94);
+    }
+
+    .volumeRow{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap: 14px;
+      padding: 10px 0 2px;
+    }
+    .volBtn{
+      width: 56px;
+      height: 56px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255,255,255,.18), transparent 55%),
+        linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.45));
+      box-shadow:
+        inset 0 1px 2px rgba(255,255,255,.12),
+        inset 0 -3px 6px rgba(0,0,0,.55),
+        0 12px 26px rgba(0,0,0,.55);
+      color: rgba(255,255,255,.9);
+      cursor:pointer;
+      font-size: 26px;
+      display:grid;
+      place-items:center;
+      user-select:none;
+    }
+    .volBtn:hover{ border-color: rgba(245,194,75,.55); }
+    .volDots{
+      display:flex;
+      gap: 8px;
+      align-items:center;
+    }
+    .dot{
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.25);
+      background: rgba(255,255,255,.10);
+    }
+    .dot.on{
+      background: rgba(255,255,255,.90);
+      border-color: rgba(255,255,255,.75);
+      box-shadow: 0 0 10px rgba(255,255,255,.18);
+    }
+
+    .scheduleList{
+      margin: 8px 0 0;
+      padding: 0;
+      list-style: none;
+      border-top: 1px solid rgba(255,255,255,.10);
+    }
+    .scheduleList li{
+      padding: 10px 2px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      font-size: 13px;
+      color: rgba(255,255,255,.82);
+      display:flex;
+      justify-content:space-between;
+      gap: 10px;
+    }
+    .scheduleList small{
+      color: rgba(255,255,255,.60);
+      font-size: 12px;
+      white-space:nowrap;
+    }
+
+    /* Search bar (top-left) */
+    .searchWrap{
+      display:none; /* toggled by search icon */
+      gap: 10px;
+      align-items:center;
+      min-width: min(520px, 60vw);
+    }
+    .searchWrap.open{ display:flex; }
+    .searchInput{
+      width: min(520px, 60vw);
+      max-width: 520px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.25);
+      color: rgba(255,255,255,.92);
+      outline:none;
+      box-shadow: inset 0 1px 2px rgba(255,255,255,.08);
+    }
+    .tinyHint{
+      font-size: 12px;
+      color: rgba(255,255,255,.55);
+      margin-top: 8px;
+      text-align:center;
+    }
+
+    /* Responsive */
+    @media (max-width: 640px){
+      .title{ font-size: 22px; }
+      .deco{ font-size: 28px; }
+      .trackTitle{ font-size: 22px; }
+      .chanTile{ width: 78px; }
+      .chanLabel{ font-size: 13px; }
+      .searchInput{ width: 52vw; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+
+    <header class="topbar">
+      <div class="topLeft">
+        <button class="iconBtn" id="btnSearch" title="Search">
+          <!-- magnifier -->
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" stroke="currentColor" stroke-width="2"/>
+            <path d="M16.5 16.5 21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+
+        <div class="brand">
+          <div class="logo" title="Golden Radio Hour">
+            <!-- optional: upload grh_logo.png; if not, it will show empty but still fine -->
+            <img src="grh_logo.png" alt="GRH" onerror="this.style.display='none';" />
+          </div>
+          <div class="titleWrap">
+            <div class="title">Old Time Radio</div>
+          </div>
+        </div>
+
+        <div class="searchWrap" id="searchWrap">
+          <input id="searchInput" class="searchInput" placeholder="Search current channel..." />
+        </div>
+      </div>
+
+      <div class="topRight">
+        <button class="iconBtn" id="btnMenu" title="Menu">
+          <!-- hamburger -->
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="stage">
+      <div class="stageInner">
+        <div class="specks"></div>
+
+        <p class="stageTopNote">SELECT A CHANNEL</p>
+
+        <div class="nowLine" id="nowLine">
+          Now Playing on <strong id="channelName">The Suspense Channel</strong>
+        </div>
+
+        <!-- decorative divider -->
+        <svg class="dividerSwirl" viewBox="0 0 300 28" fill="none" aria-hidden="true">
+          <path d="M10 14c26-18 42 18 68 0s42 18 68 0 42 18 68 0 42 18 68 0"
+                stroke="rgba(255,255,255,.72)" stroke-width="2" stroke-linecap="round"/>
+          <path d="M70 14c14-10 22 10 36 0s22 10 36 0 22 10 36 0"
+                stroke="rgba(255,255,255,.45)" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+
+        <div class="trackTitle" id="trackTitle">—</div>
+        <div class="metaLine" id="metaLine">—</div>
+
+        <div class="audioWrap">
+          <audio id="audio" controls preload="none"></audio>
+          <div class="tinyHint" id="statusHint">Tip: pick a channel below to start continuous play.</div>
+        </div>
+      </div>
+    </main>
+
+    <nav class="dock" aria-label="Channels">
+      <div class="dockRow" id="dockRow"></div>
+    </nav>
+
+  </div>
+
+  <!-- Modal -->
+  <div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-label="Menu">
+    <div class="modal">
+      <div class="modalTop">
+        <div class="modalTitle">Menu</div>
+        <button class="closeBtn" id="btnClose" title="Close">
+          <!-- X -->
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modalBody">
+
+        <div class="section">
+          <h3>Schedule</h3>
+          <p>Select a channel to see what’s coming up.</p>
+
+          <div class="pillRow" id="modalChannelRow"></div>
+
+          <ul class="scheduleList" id="scheduleList"></ul>
+        </div>
+
+        <div class="section">
+          <h3>Visualiser</h3>
+          <p>Select a visualiser (placeholder for now).</p>
+          <div class="pillRow" id="vizRow">
+            <div class="pill active" data-viz="none">None</div>
+            <div class="pill" data-viz="spiro">Spirograph</div>
+            <div class="pill" data-viz="osc">Oscillograph</div>
+            <div class="pill" data-viz="phono">Phonograph</div>
+          </div>
+          <p style="margin-top:10px;color:rgba(255,255,255,.60);font-size:12px;">
+            Note: Visualizers require Web Audio API + canvas. This UI is ready; we can wire it later.
+          </p>
+        </div>
+
+        <div class="section">
+          <h3>Volume</h3>
+          <p>Step volume up/down.</p>
+          <div class="volumeRow">
+            <div class="volBtn" id="volDown" aria-label="Volume down">−</div>
+            <div class="volDots" id="volDots"></div>
+            <div class="volBtn" id="volUp" aria-label="Volume up">+</div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>Preferences</h3>
+          <p style="margin-bottom:0">This lab build focuses on channels + continuous play. Next upgrades: real schedule, favorites, and real visualizers.</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+<script>
+/* =========================
+   CONFIG
+========================= */
+const DATA_URL = "./shows.json";
+
+/**
+ * CHANNELS you want exposed in the UI.
+ * Keep this list aligned with your brand.
+ */
+const CHANNELS = [
+  "Future",
+  "Action",
+  "Crime",
+  "Horror",
+  "Suspense",
+  "Western",
+  "Comedy",
+  "Drama",
+  "Sports"
+];
+
+/**
+ * OPTIONAL: Explicit mapping (best long-term).
+ * Keys should match `track.show` in your JSON.
+ * If a show isn't here, we fall back to heuristics.
+ */
+const SHOW_TO_CHANNEL = {
+  "BBCMarlowe": "Crime",
+  "BBC_Chillers": "Horror",
+  "Beyond Midnight": "Horror",
+  "BBC-presents-AlfredHitchcock": "Suspense",
+  "bbc-sci-fi-radio-plays-part-five": "Future",
+  "bbc-sci-fi-radio-plays-part-nine": "Future"
+  // Add more as you want. You can keep expanding this list over time.
+};
+
+/* =========================
+   STATE
+========================= */
+let allTracks = [];
+let currentChannel = "Suspense";
+let channelQueue = [];
+let channelIndex = 0;
+let searchQuery = "";
+
+const audioEl = document.getElementById("audio");
+const channelNameEl = document.getElementById("channelName");
+const trackTitleEl = document.getElementById("trackTitle");
+const metaLineEl = document.getElementById("metaLine");
+const statusHintEl = document.getElementById("statusHint");
+
+const dockRowEl = document.getElementById("dockRow");
+const modalChannelRowEl = document.getElementById("modalChannelRow");
+const scheduleListEl = document.getElementById("scheduleList");
+
+const overlayEl = document.getElementById("overlay");
+const btnMenu = document.getElementById("btnMenu");
+const btnClose = document.getElementById("btnClose");
+
+const btnSearch = document.getElementById("btnSearch");
+const searchWrap = document.getElementById("searchWrap");
+const searchInput = document.getElementById("searchInput");
+
+const volDotsEl = document.getElementById("volDots");
+const volDown = document.getElementById("volDown");
+const volUp = document.getElementById("volUp");
+
+/* =========================
+   HELPERS
+========================= */
+function norm(s){ return (s || "").toString().toLowerCase(); }
+
+function formatTime(seconds){
+  if (!Number.isFinite(seconds)) return "";
+  seconds = Math.max(0, Math.floor(seconds));
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
+  const pad = n => String(n).padStart(2,"0");
+  return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
+}
+
+function titleOf(t){
+  return t.displayTitle || t.title || "Untitled";
+}
+
+function inferredChannel(track){
+  // 1) If the JSON already has channel, use it
+  if (track.channel && CHANNELS.includes(track.channel)) return track.channel;
+
+  // 2) Explicit show mapping
+  const show = track.show || track.showTitle || "";
+  if (SHOW_TO_CHANNEL[show]) return SHOW_TO_CHANNEL[show];
+
+  // 3) Heuristics (good enough for lab)
+  const hay = [
+    track.show, track.showTitle, track.title, track.displayTitle, track.genre,
+    Array.isArray(track.tags) ? track.tags.join(" ") : ""
+  ].map(norm).join(" ");
+
+  if (/(sci[- ]?fi|science fiction|x[- ]?minus[- ]?one|dimension x|space|alien|robot|future|asimov|wells|bradbury|neuromancer)/i.test(hay))
+    return "Future";
+
+  if (/(horror|ghost|chiller|terror|macabre|haunt|nightmare|vampire|werewolf|monster)/i.test(hay))
+    return "Horror";
+
+  if (/(crime|detective|murder|police|dragnet|noir|marlowe|private eye|case|robbery|heist)/i.test(hay))
+    return "Crime";
+
+  if (/(suspense|hitchcock|thriller|mystery|molle|mystery theatre|whistler)/i.test(hay))
+    return "Suspense";
+
+  if (/(western|gunsmoke|cowboy|ranger|frontier|six shooter)/i.test(hay))
+    return "Western";
+
+  if (/(comedy|funny|fibber|mcgee|skelton|variety|sitcom)/i.test(hay))
+    return "Comedy";
+
+  if (/(sports|baseball|boxing|football|basketball|race)/i.test(hay))
+    return "Sports";
+
+  if (/(action|adventure|spy|secret agent|war|battle|mission)/i.test(hay))
+    return "Action";
+
+  return "Drama";
+}
+
+function shuffle(arr){
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function applySearch(tracks){
+  const q = norm(searchQuery).trim();
+  if (!q) return tracks;
+  return tracks.filter(t => {
+    const hay = [
+      t.channel, t.show, t.showTitle, t.title, t.displayTitle, t.genre,
+      Array.isArray(t.tags) ? t.tags.join(" ") : ""
+    ].map(norm).join(" ");
+    return hay.includes(q);
+  });
+}
+
+function setActiveDock(){
+  document.querySelectorAll(".chanTile").forEach(el => {
+    el.classList.toggle("active", el.dataset.channel === currentChannel);
+  });
+  document.querySelectorAll("#modalChannelRow .pill").forEach(el => {
+    el.classList.toggle("active", el.dataset.channel === currentChannel);
+  });
+}
+
+/* =========================
+   RENDER
+========================= */
+function renderDock(){
+  dockRowEl.innerHTML = "";
+  CHANNELS.forEach(ch => {
+    const tile = document.createElement("div");
+    tile.className = "chanTile";
+    tile.dataset.channel = ch;
+
+    const orb = document.createElement("div");
+    orb.className = "chanOrb";
+
+    const label = document.createElement("div");
+    label.className = "chanLabel";
+    label.textContent = ch;
+
+    tile.appendChild(orb);
+    tile.appendChild(label);
+    tile.addEventListener("click", () => switchChannel(ch, true));
+
+    dockRowEl.appendChild(tile);
+  });
+}
+
+function renderModalChannels(){
+  modalChannelRowEl.innerHTML = "";
+  CHANNELS.forEach(ch => {
+    const pill = document.createElement("div");
+    pill.className = "pill";
+    pill.dataset.channel = ch;
+    pill.textContent = ch;
+    pill.addEventListener("click", () => switchChannel(ch, false));
+    modalChannelRowEl.appendChild(pill);
+  });
+}
+
+function renderNowPlaying(track){
+  const channelLabel = `The ${currentChannel} Channel`;
+  channelNameEl.textContent = channelLabel;
+
+  if (!track){
+    trackTitleEl.textContent = "—";
+    metaLineEl.textContent = "—";
+    return;
+  }
+
+  trackTitleEl.textContent = titleOf(track);
+  const show = track.show || track.showTitle || "Unknown Show";
+  const len = formatTime(track.durationSeconds);
+  const extras = [];
+  extras.push(`Show: ${show}`);
+  if (len) extras.push(`Length: ${len}`);
+  metaLineEl.textContent = extras.join(" • ");
+}
+
+function renderSchedule(){
+  // Show next 10 items (after the current one)
+  scheduleListEl.innerHTML = "";
+
+  const queue = channelQueue;
+  if (!queue.length){
+    const li = document.createElement("li");
+    li.textContent = "No items found in this channel.";
+    scheduleListEl.appendChild(li);
+    return;
+  }
+
+  const items = [];
+  for (let i = 1; i <= 10; i++){
+    const idx = (channelIndex + i) % queue.length;
+    items.push(queue[idx]);
+  }
+
+  items.forEach((t, i) => {
+    const li = document.createElement("li");
+    const left = document.createElement("span");
+    left.textContent = `${i+1}. ${titleOf(t)}`;
+
+    const right = document.createElement("small");
+    right.textContent = t.show || t.showTitle || "";
+
+    li.appendChild(left);
+    li.appendChild(right);
+    scheduleListEl.appendChild(li);
+  });
+}
+
+/* =========================
+   PLAYBACK
+========================= */
+function buildChannelQueue(channel){
+  const base = allTracks
+    .map(t => ({...t, channel: inferredChannel(t)}))
+    .filter(t => t.channel === channel);
+
+  const searched = applySearch(base);
+  return shuffle(searched);
+}
+
+function loadIndex(i, autoplay){
+  if (!channelQueue.length) return;
+
+  channelIndex = Math.max(0, Math.min(i, channelQueue.length - 1));
+  const t = channelQueue[channelIndex];
+
+  audioEl.src = t.url;
+  renderNowPlaying(t);
+  renderSchedule();
+
+  statusHintEl.textContent = `Channel: ${currentChannel} • ${channelQueue.length} item(s) in rotation${searchQuery ? " • filtered" : ""}`;
+
+  if (autoplay){
+    audioEl.play().catch(() => {
+      // autoplay might be blocked; user can press play
+    });
+  }
+}
+
+function switchChannel(channel, autoplay){
+  currentChannel = channel;
+
+  channelQueue = buildChannelQueue(currentChannel);
+  channelIndex = 0;
+
+  setActiveDock();
+  renderNowPlaying(channelQueue[0] || null);
+  renderSchedule();
+
+  if (channelQueue.length){
+    audioEl.src = channelQueue[0].url;
+    if (autoplay) audioEl.play().catch(()=>{});
+  } else {
+    audioEl.removeAttribute("src");
+  }
+}
+
+audioEl.addEventListener("ended", () => {
+  if (!channelQueue.length) return;
+  channelIndex++;
+  if (channelIndex >= channelQueue.length){
+    channelQueue = shuffle(channelQueue);
+    channelIndex = 0;
+  }
+  loadIndex(channelIndex, true);
+});
+
+/* =========================
+   MODAL + SEARCH + VOLUME
+========================= */
+function openModal(){ overlayEl.classList.add("open"); }
+function closeModal(){ overlayEl.classList.remove("open"); }
+
+btnMenu.addEventListener("click", openModal);
+btnClose.addEventListener("click", closeModal);
+overlayEl.addEventListener("click", (e) => {
+  if (e.target === overlayEl) closeModal();
+});
+
+btnSearch.addEventListener("click", () => {
+  searchWrap.classList.toggle("open");
+  if (searchWrap.classList.contains("open")){
+    searchInput.focus();
+  } else {
+    searchInput.value = "";
+    searchQuery = "";
+    // rebuild current channel without filter
+    switchChannel(currentChannel, false);
+  }
+});
+
+searchInput.addEventListener("input", () => {
+  searchQuery = searchInput.value || "";
+  switchChannel(currentChannel, false);
+});
+
+document.querySelectorAll("#vizRow .pill").forEach(p => {
+  p.addEventListener("click", () => {
+    document.querySelectorAll("#vizRow .pill").forEach(x => x.classList.remove("active"));
+    p.classList.add("active");
+    // placeholder: wire later
+  });
+});
+
+// Volume dots (10 steps)
+const VOL_STEPS = 10;
+function setVolume(v){
+  v = Math.max(0, Math.min(1, v));
+  audioEl.volume = v;
+  renderVolDots();
+}
+function renderVolDots(){
+  volDotsEl.innerHTML = "";
+  const onCount = Math.round(audioEl.volume * VOL_STEPS);
+  for (let i = 1; i <= VOL_STEPS; i++){
+    const dot = document.createElement("div");
+    dot.className = "dot" + (i <= onCount ? " on" : "");
+    volDotsEl.appendChild(dot);
+  }
+}
+volDown.addEventListener("click", () => {
+  const step = 1 / VOL_STEPS;
+  setVolume(audioEl.volume - step);
+});
+volUp.addEventListener("click", () => {
+  const step = 1 / VOL_STEPS;
+  setVolume(audioEl.volume + step);
+});
+
+/* =========================
+   LOAD DATA
+========================= */
+async function init(){
+  renderDock();
+  renderModalChannels();
+  setVolume(0.6);
+
+  try{
+    const res = await fetch(DATA_URL, { cache: "no-store" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+
+    // Your shows.json is an array of track objects (flat list)
+    if (!Array.isArray(data)) throw new Error("shows.json must be a JSON array of tracks.");
+
+    allTracks = data;
+
+    // Prime channel
+    switchChannel(currentChannel, false);
+    setActiveDock();
+
+    // If you want auto-start on first channel, change false -> true:
+    // switchChannel(currentChannel, true);
+
+  }catch(err){
+    trackTitleEl.textContent = "Couldn’t load shows.json";
+    metaLineEl.textContent = String(err?.message || err);
+    statusHintEl.textContent = "Fix: ensure shows.json is in the same folder as index.html and valid JSON.";
+  }
+}
+
+init();
+</script>
+</body>
+</html>
