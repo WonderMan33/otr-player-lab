@@ -329,7 +329,7 @@
           <div class="sub">hosted by Golden Radio Hour</div>
         </div>
       </div>
-      <div style="font-size:12px;color:rgba(255,255,255,.70);">Simple. Big buttons. Easy listening.</div>
+      
     </header>
 
     <div class="modePills" id="modePills">
@@ -374,6 +374,7 @@
           <div class="vizOverlay"></div>
 
           <div class="vizStrip" id="vizStrip">
+  <button class="vizBtn" id="vizFullscreenBtn" type="button">Fullscreen</button>
             <button class="vizBtn active" data-viz="none" type="button">Off</button>
             <button class="vizBtn" data-viz="wave" type="button">Wave</button>
             <button class="vizBtn" data-viz="bars" type="button">Bars</button>
@@ -756,6 +757,28 @@
     }
     userSeeking = false;
   });
+
+  
+  // ---------- fullscreen visualizer ----------
+  const vizBox = document.querySelector(".viz");
+  const vizFullscreenBtn = document.getElementById("vizFullscreenBtn");
+
+  vizFullscreenBtn?.addEventListener("click", async () => {
+    try{
+      if (!document.fullscreenElement) {
+        await vizBox.requestFullscreen();
+      } else {
+        await document.exitFullscreen();
+      }
+    }catch(e){
+      console.error("Fullscreen failed:", e);
+    }
+  });
+
+  document.addEventListener("fullscreenchange", () => {
+    resizeCanvas();
+  });
+
 
   // ---------- visualizer ----------
   const vizCanvas = document.getElementById("vizCanvas");
