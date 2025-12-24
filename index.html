@@ -1097,13 +1097,11 @@ const channelSection = document.getElementById("channelSection");
 const showSection = document.getElementById("showSection");
 
 const showSelect = document.getElementById("showSelect");
-const btnModeChannel = document.getElementById("btnModeChannel");
-const btnModeShow = document.getElementById("btnModeShow");
 const showPickerPanel = document.getElementById("showPickerPanel");
 const showSelectInline = document.getElementById("showSelectInline");
 const vizStrip = document.getElementById("vizStrip");
-const pillChannel = document.getElementById("pillChannel");
-const pillShow = document.getElementById("pillShow");
+const pillListenChannel = document.getElementById("pillListenChannel");
+const pillListenShow = document.getElementById("pillListenShow");
 const episodeBox = document.getElementById("episodeBox");
 const browsePanel = document.getElementById("browsePanel");
 
@@ -1862,33 +1860,44 @@ document.querySelectorAll("#vizRow .pill").forEach(p => {
 ========================= */
 
 function getDockEl(){
-  return document.getElementById("dock") || document.getElementById("dockWrap") || document.querySelector(".dock");
+  return document.querySelector("nav.dock") || document.querySelector(".dock");
+}
+function getBrowsePanelEl(){
+  // browsePanel is the show mode panel that contains show dropdown and episode list
+  return document.getElementById("browsePanel") || document.getElementById("showPickerPanel");
 }
 
 function setModeFromUI(newMode){
   mode = newMode;
   const dockEl = getDockEl();
+  const browseEl = getBrowsePanelEl();
 
-  btnModeChannel?.classList.toggle("active", mode === "channel");
-  btnModeShow?.classList.toggle("active", mode === "show");
-
-  pillChannel?.classList.toggle("active", mode === "channel");
-  pillShow?.classList.toggle("active", mode === "show");
+  // Root pills are the authority
+  pillListenChannel?.classList.toggle("active", mode === "channel");
+  pillListenShow?.classList.toggle("active", mode === "show");
 
   // Channel buttons only in Channel mode
   safeShow(dockEl, mode === "channel");
-  // Show dropdown only in Show mode
-  safeShow(showPickerPanel, mode === "show");
+  // Show controls only in Show mode
+  safeShow(browseEl, mode === "show");
 
   setModeUI();
 }
 
-btnModeChannel?.addEventListener("click", () => {
+
+pillListenChannel?.addEventListener("click", () => {
   setModeFromUI("channel");
 });
 
-btnModeShow?.addEventListener("click", () => {
+pillListenShow?.addEventListener("click", () => {
   setModeFromUI("show");
+  // No autoplay — wait until a show is selected.
+});
+
+
+
+});
+
   // No autoplay — wait for show selection
 });
 
