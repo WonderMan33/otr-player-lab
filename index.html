@@ -1160,9 +1160,6 @@ const showSelectInline = document.getElementById("showSelectInline");
 const vizStrip = document.getElementById("vizStrip");
 const btnModeChannel = document.getElementById("btnModeChannel");
 const btnModeShow = document.getElementById("btnModeShow");
-const showPickerPanel = document.getElementById("showPickerPanel");
-const showSelectInline = document.getElementById("showSelectInline");
-const vizStrip = document.getElementById("vizStrip");
 const episodeBox = document.getElementById("episodeBox");
 const browsePanel = document.getElementById("browsePanel");
 
@@ -1941,6 +1938,28 @@ function setModeFromUI(newMode){
   setModeUI();
 }
 
+
+pillListenChannel?.addEventListener("click", () => {
+  setModeFromUI("channel");
+});
+
+pillListenShow?.addEventListener("click", () => {
+  setModeFromUI("show");
+  // No autoplay — wait until a show is selected.
+});
+
+
+showSelectInline?.addEventListener("change", () => {
+  const v = showSelectInline.value;
+  if (v === "__all__" || !v) return;
+
+  currentShow = v;
+  showTracks = buildShowTracks(currentShow);
+  renderEpisodes();
+  setModeFromUI("show");
+  playShowIndex(0, true);
+});
+
 btnModeChannel?.addEventListener("click", () => {
   setModeFromUI("channel");
 });
@@ -1960,13 +1979,7 @@ vizStrip?.querySelectorAll("[data-viz]")?.forEach(btn => {
   });
 });
 
-showSelectInline?.addEventListener("change", () => {
-  const v = showSelectInline.value;
-  if (v === "__all__" || !v) return;
-
-  currentShow = v;
-  showTracks = buildShowTracks(currentShow);
-  renderEpisodes();
+renderEpisodes();
   setModeFromUI("show");
   playShowIndex(0, true);
 });
