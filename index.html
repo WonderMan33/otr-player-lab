@@ -702,6 +702,16 @@ body.compact .volMain{ height: 120px; }
   border-color: rgba(245,194,75,.80);
 }
 
+
+.showPickerPanel{
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(0,0,0,.14);
+}
+.showPickerPanel .select{ width:100%; }
+
 </style>
 </head>
 
@@ -1041,7 +1051,8 @@ const showSection = document.getElementById("showSection");
 const showSelect = document.getElementById("showSelect");
 const btnModeChannel = document.getElementById("btnModeChannel");
 const btnModeShow = document.getElementById("btnModeShow");
-const btnChooseShow = document.getElementById("btnChooseShow");
+const showPickerPanel = document.getElementById("showPickerPanel");
+const showSelectInline = document.getElementById("showSelectInline");
 const vizStrip = document.getElementById("vizStrip");
 const showSearch = document.getElementById("showSearch");
 const episodeBox = document.getElementById("episodeBox");
@@ -1222,11 +1233,13 @@ if (channelQueue.length){
 function renderShowSelect(){
   const shows = showsList;
   showSelect.innerHTML = `<option value="__all__">Select a show…</option>`;
+  if (showSelectInline) showSelectInline.innerHTML = `<option value="__all__">Select a show…</option>`;
   for (const show of shows){
     const opt = document.createElement("option");
     opt.value = show;
     opt.textContent = show;
     showSelect.appendChild(opt);
+    if (showSelectInline) showSelectInline.appendChild(opt.cloneNode(true));
   }
 }
 
@@ -1356,6 +1369,19 @@ audioEl.addEventListener("ended", () => {
   }
   loadChannelIndex(channelIndex, true);
 });
+
+
+showSelectInline?.addEventListener("change", () => {
+  const v = showSelectInline.value;
+  if (v === "__all__" || !v) return;
+  currentShow = v;
+  showTracks = buildShowTracks(currentShow);
+  renderEpisodes();
+  setModeFromUI("show");
+  playShowIndex(0, true);
+});
+
+
 
 function openModal(){ overlayEl.classList.add("open"); }
 function closeModal(){ overlayEl.classList.remove("open"); }
@@ -1816,8 +1842,7 @@ function setModeFromUI(newMode){
   mode = newMode;
   btnModeChannel?.classList.toggle("active", mode === "channel");
   btnModeShow?.classList.toggle("active", mode === "show");
-  // In show mode, encourage choosing a show
-  btnChooseShow?.classList.toggle("active", mode === "show" && !!currentShow);
+  safeShow(showPickerPanel, mode === "show");
   setModeUI();
 }
 
@@ -1829,11 +1854,8 @@ btnModeChannel?.addEventListener("click", () => {
 
 btnModeShow?.addEventListener("click", () => {
   setModeFromUI("show");
-  // If no show selected yet, prompt them immediately
-  if (!currentShow) openMenu();
 });
 
-btnChooseShow?.addEventListener("click", () => {
   setModeFromUI("show");
   openMenu();
 });
