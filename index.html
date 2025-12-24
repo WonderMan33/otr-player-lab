@@ -3,2077 +3,945 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Old Time Radio Archive — Hosted by Golden Radio Hour</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23d7b24a'/%3E%3Ctext x='50' y='62' font-size='48' text-anchor='middle' fill='black'%3E%F0%9F%93%BB%3C/text%3E%3C/svg%3E" />
-
+  <title>Old Time Radio Archive — hosted by Golden Radio Hour</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23d7b24a'/%3E%3Ctext x='50' y='64' font-size='52' text-anchor='middle'%3E%F0%9F%93%BB%3C/text%3E%3C/svg%3E" />
   <style>
     :root{
-      --bg:#070707;
-      --line:rgba(255,255,255,.10);
-      --text:#f2f2f2;
-      --muted:rgba(255,255,255,.70);
-      --accent:#f5c24b;
-      --radius:18px;
+      --bg0:#070707;
+      --bg1:#0d0d0d;
+      --glass: rgba(0,0,0,.38);
+      --stroke: rgba(255,255,255,.12);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.70);
+      --gold: #f5c24b;
+      --gold2:#d7b24a;
     }
     *{ box-sizing:border-box; }
-    html,body{ height:100%; }
     body{
       margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--text);
       background:
-        radial-gradient(900px 450px at 20% -10%, rgba(245,194,75,.10), transparent 55%),
-        radial-gradient(900px 450px at 90% 0%, rgba(245,194,75,.06), transparent 55%),
-        radial-gradient(1200px 800px at 50% 120%, rgba(255,255,255,.06), transparent 55%),
-        var(--bg);
-      color:var(--text);
-      overflow-x:hidden;
+        radial-gradient(1000px 600px at 20% 10%, rgba(245,194,75,.16), transparent 60%),
+        radial-gradient(1000px 600px at 80% 20%, rgba(255,255,255,.06), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      min-height:100vh;
     }
-
-    /* Visualizer canvas sits behind UI */
-    #vizCanvas{
-      position:fixed;
-      inset:0;
-      width:100%;
-      height:100%;
-      z-index:1;
-      pointer-events:none;
-      opacity:0.55;
-      display:none;
+    .wrap{
+      width:min(1100px, 94vw);
+      margin: 18px auto 30px;
     }
-
-    .app{
-      position:relative;
-      z-index:2;
-      max-width: 980px;
-      margin: 0 auto;
-      padding: 14px 12px 26px;
-    }
-
-    /* Top bar */
-    .topbar{
-      position: sticky;
-      top: 10px;
-      z-index: 10;
+    header{
       display:flex;
+      gap:14px;
       align-items:center;
       justify-content:space-between;
-      gap: 12px;
-      padding: 14px 14px;
-      border:1px solid var(--line);
-      border-radius: var(--radius);
-      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.30));
-      box-shadow: 0 18px 55px rgba(0,0,0,.55);
+      padding: 14px 16px;
+      border: 1px solid var(--stroke);
+      background: rgba(0,0,0,.22);
+      border-radius: 18px;
       backdrop-filter: blur(8px);
     }
-    .topLeft, .topRight{
-      display:flex;
-      align-items:center;
-      gap: 12px;
-      min-width: 0;
-    }
-
-    .iconBtn{
-      width: 44px;
-      height: 44px;
-      border-radius: 999px;
-      border:1px solid var(--line);
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.30));
-      color: var(--text);
-      display:grid;
-      place-items:center;
-      cursor:pointer;
-      user-select:none;
-      box-shadow:
-        inset 0 1px 2px rgba(255,255,255,.10),
-        0 10px 22px rgba(0,0,0,.45);
-    }
-    .iconBtn:hover{ border-color: rgba(245,194,75,.55); }
-    .iconBtn:active{ transform: translateY(1px); }
-
     .brand{
-      display:flex;
-      align-items:center;
-      gap: 12px;
-      min-width:0;
+      display:flex; gap:12px; align-items:center;
     }
     .logo{
-      width: 44px;
-      height: 44px;
-      border-radius: 999px;
-      border:1px solid rgba(0,0,0,.55);
-      background:
-        radial-gradient(circle at 30% 30%, rgba(255,255,255,.22), transparent 55%),
-        linear-gradient(145deg, var(--accent), #9c7730);
-      display:grid;
-      place-items:center;
-      overflow:hidden;
-      flex: 0 0 auto;
-      box-shadow:
-        inset 0 1px 2px rgba(255,255,255,.28),
-        inset 0 -2px 4px rgba(0,0,0,.45),
-        0 10px 20px rgba(0,0,0,.55);
+      width:40px;height:40px;border-radius:14px;
+      display:grid;place-items:center;
+      background: radial-gradient(circle at 30% 20%, rgba(255,255,255,.22), rgba(0,0,0,.55));
+      border:1px solid rgba(255,255,255,.14);
+      box-shadow: 0 10px 30px rgba(0,0,0,.40);
+      font-size:20px;
     }
-    .logo img{
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      padding: 6px;
-      filter: drop-shadow(0 1px 1px rgba(0,0,0,.55));
-    }
-
-    .titleWrap{ min-width:0; }
-    .title{
+    .brand h1{
       margin:0;
-      font-weight: 650;
+      font-size: 16px;
+      letter-spacing:.6px;
+      font-weight: 700;
+    }
+    .brand .sub{
+      margin-top:2px;
+      font-size: 12px;
+      color: var(--muted);
       letter-spacing:.4px;
-      font-size: 18px;
-      line-height:1.15;
-      color: rgba(255,255,255,.95);
-      text-shadow: 0 0 14px rgba(255,255,255,.20);
-      white-space: nowrap;
-      overflow:hidden;
-      text-overflow: ellipsis;
-    }
-    .subtitle{
-      margin-top: 2px;
-      font-size: 12px;
-      color: rgba(255,255,255,.62);
-      white-space: nowrap;
-      overflow:hidden;
-      text-overflow: ellipsis;
     }
 
-    /* Stage */
-    .stage{
-      margin-top: 14px;
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background:
-        radial-gradient(900px 320px at 50% 0%, rgba(255,255,255,.05), transparent 58%),
-        rgba(0,0,0,.52);
-      box-shadow: 0 22px 70px rgba(0,0,0,.60);
-      overflow:hidden;
-    }
-    .stageInner{
-      padding: 20px 16px 14px;
-      min-height: 320px;
+    /* Root mode pills */
+    .modePills{
       display:flex;
-      flex-direction:column;
       justify-content:center;
-      align-items:center;
-      text-align:center;
-      position: relative;
+      gap:14px;
+      margin: 14px auto 10px;
+      flex-wrap:wrap;
     }
-    .stageTopNote{
-      margin:0 0 10px;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      font-size: 12px;
-      color: rgba(255,255,255,.70);
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    }
-    .nowLine{
-      margin: 0 0 12px;
-      font-size: 22px;
-      color: rgba(255,255,255,.82);
-      text-shadow: 0 0 16px rgba(255,255,255,.10);
-      line-height: 1.2;
-    }
-    .nowLine strong{
-      font-weight: 650;
-      color: rgba(255,255,255,.95);
-    }
-
-    .dividerSwirl{
-      width: 220px;
-      height: 20px;
-      margin: 8px 0 14px;
-      opacity: .9;
-      filter: drop-shadow(0 2px 8px rgba(0,0,0,.55));
-    }
-
-    .trackTitle{
-      font-size: 24px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      font-weight: 500;
-      color: rgba(255,255,255,.88);
-      text-shadow: 0 0 18px rgba(255,255,255,.14);
-      margin: 0 0 10px;
-      max-width: 880px;
-      padding: 0 12px;
-      word-break: break-word;
-    }
-
-    .metaLine{
-      font-size: 12px;
-      color: rgba(255,255,255,.70);
-      margin: 0 0 12px;
-      letter-spacing: .3px;
-    }
-
-    .audioWrap{
-      width: min(820px, 100%);
-      padding: 10px 12px 6px;
-      border-top: 1px solid rgba(255,255,255,.08);
-      margin-top: 8px;
-    }
-    audio{ width:100%; }
-
-/* Custom player bar (skip buttons live here) */
-.playerBar{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding: 10px 0 0;
-  width: min(820px, 100%);
-  margin: 0 auto;
-}
-.pbtn{
-  width: 44px;
-  height: 44px;
-  border-radius: 999px;
-  border:1px solid var(--line);
-  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.30));
-  color: rgba(255,255,255,.92);
-  display:grid;
-  place-items:center;
-  cursor:pointer;
-  user-select:none;
-  box-shadow:
-    inset 0 1px 2px rgba(255,255,255,.10),
-    0 10px 22px rgba(0,0,0,.45);
-}
-.pbtn:hover{ border-color: rgba(245,194,75,.55); }
-.pbtn:active{ transform: translateY(1px); }
-.ptime{
-  font-variant-numeric: tabular-nums;
-  font-size: 12px;
-  color: rgba(255,255,255,.70);
-  min-width: 46px;
-  text-align:center;
-}
-.seek{
-  flex: 1 1 auto;
-  width: 100%;
-  accent-color: var(--accent);
-}
-
-    .tinyHint{
-      font-size:12px;
-      color: rgba(255,255,255,.55);
-      margin-top: 8px;
-      text-align:center;
-    }
-
-    /* Bottom channel dock */
-    .dock{
-      margin-top: 14px;
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(0,0,0,.45));
-      box-shadow: 0 18px 60px rgba(0,0,0,.55);
-      padding: 12px 10px 10px;
-      overflow-x: auto;
-      scrollbar-width: thin;
-    }
-    .dockRow{
-      display:flex;
-      align-items:flex-end;
-      gap: 10px;
-      min-width: max-content;
-      padding-bottom: 2px;
-    }
-    .chanTile{
-      width: 86px;
-      flex: 0 0 auto;
-      cursor:pointer;
-      user-select:none;
-      text-align:center;
-      color: rgba(255,255,255,.86);
-    }
-    .chanOrb{
-      width: 52px;
-      height: 52px;
-      margin: 0 auto 6px;
+    .pillBtn{
+      padding: 12px 18px;
       border-radius: 999px;
       border: 1px solid rgba(255,255,255,.16);
-      background:
-        radial-gradient(circle at 30% 30%, rgba(255,255,255,.30), transparent 55%),
-        radial-gradient(circle at 50% 65%, rgba(255,255,255,.12), transparent 55%),
-        linear-gradient(180deg, rgba(255,255,255,.08), rgba(0,0,0,.55));
-      box-shadow:
-        inset 0 1px 2px rgba(255,255,255,.14),
-        inset 0 -3px 6px rgba(0,0,0,.55),
-        0 10px 24px rgba(0,0,0,.55);
-      transition: transform 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
-    }
-    .chanLabel{
+      background: radial-gradient(circle at 30% 20%, rgba(255,255,255,.18), rgba(0,0,0,.38) 55%, rgba(0,0,0,.55));
+      color: rgba(255,255,255,.92);
+      cursor:pointer;
       font-size: 14px;
-      letter-spacing:.2px;
-      text-shadow: 0 0 10px rgba(255,255,255,.12);
-      white-space:nowrap;
-    }
-    .chanTile:hover .chanOrb{ border-color: rgba(245,194,75,.55); }
-    .chanTile:active .chanOrb{ transform: translateY(1px); }
-    .chanTile.active .chanOrb{
-      border-color: rgba(245,194,75,.85);
-      box-shadow:
-        inset 0 1px 2px rgba(255,255,255,.18),
-        inset 0 -3px 6px rgba(0,0,0,.55),
-        0 0 0 2px rgba(245,194,75,.25),
-        0 14px 30px rgba(0,0,0,.60);
-    }
-    .chanTile.active .chanLabel{
-      color: rgba(255,255,255,.96);
-      text-shadow: 0 0 12px rgba(245,194,75,.20);
-    }
-
-    /* Modal */
-    .overlay{
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.65);
-      display:none;
-      z-index: 50;
-      padding: 22px 12px;
-    }
-    .overlay.open{ display:block; }
-
-    .modal{
-      max-width: 900px;
-      margin: 0 auto;
-      border-radius: 20px;
-      border: 1px solid rgba(255,255,255,.14);
-      background:
-        radial-gradient(900px 320px at 50% 0%, rgba(255,255,255,.08), transparent 58%),
-        rgba(18,18,18,.92);
-      box-shadow: 0 28px 90px rgba(0,0,0,.75);
-      overflow:hidden;
-      position: relative;
-    }
-
-    .modalTop{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 12px;
-      padding: 12px 14px;
-      border-bottom: 1px solid rgba(255,255,255,.10);
-      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.25));
-    }
-    .modalTitle{
-      font-weight: 700;
-      letter-spacing:.4px;
-      color: rgba(255,255,255,.92);
-    }
-    .closeBtn{
-      width: 44px;
-      height: 44px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.25);
-      cursor:pointer;
-      color: rgba(255,255,255,.9);
-      display:grid;
-      place-items:center;
-    }
-    .closeBtn:hover{ border-color: rgba(245,194,75,.55); }
-
-    .modalBody{
-      padding: 14px;
-      max-height: calc(100vh - 120px);
-      overflow:auto;
-    }
-
-    .section{
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: 16px;
-      background: rgba(255,255,255,.03);
-      padding: 14px;
-      margin-bottom: 12px;
-    }
-    .section h3{
-      margin:0 0 8px;
-      font-size: 16px;
-      letter-spacing:.2px;
-      color: rgba(255,255,255,.92);
-      text-decoration: underline;
-      text-underline-offset: 4px;
-      text-decoration-thickness: 2px;
-    }
-    .section p{
-      margin: 0 0 10px;
-      font-size: 13px;
-      color: rgba(255,255,255,.72);
-    }
-
-    .pillRow{
-      display:flex;
-      flex-wrap:wrap;
-      gap: 8px;
-    }
-    .pill{
-      padding: 8px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.18);
-      cursor:pointer;
-      color: rgba(255,255,255,.86);
-      font-size: 13px;
+      letter-spacing: .8px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.10), 0 8px 24px rgba(0,0,0,.35);
       user-select:none;
     }
-    .pill:hover{ border-color: rgba(245,194,75,.55); }
-    .pill.active{
+    .pillBtn:hover{ border-color: rgba(245,194,75,.55); }
+    .pillBtn.active{
       border-color: rgba(245,194,75,.85);
-      box-shadow: 0 0 0 2px rgba(245,194,75,.20) inset;
-      color: rgba(255,255,255,.94);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.10),
+                  0 0 0 3px rgba(245,194,75,.12),
+                  0 10px 30px rgba(0,0,0,.40);
     }
 
-    /* Show picker + episode list */
-    .row{
+    /* Player card */
+    .card{
+      border: 1px solid var(--stroke);
+      background: rgba(0,0,0,.20);
+      border-radius: 20px;
+      padding: 14px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 18px 40px rgba(0,0,0,.35);
+    }
+    .topRow{
       display:flex;
+      gap:14px;
+      align-items:stretch;
       flex-wrap:wrap;
-      gap: 10px;
-      align-items:center;
     }
-    select, input[type="text"]{
-      background: rgba(0,0,0,.28);
-      color: rgba(255,255,255,.92);
-      border: 1px solid rgba(255,255,255,.14);
-      border-radius: 12px;
-      padding: 10px 12px;
-      font-size: 13px;
-      outline:none;
-      min-width: 220px;
-      max-width: 100%;
-      box-shadow: inset 0 1px 2px rgba(255,255,255,.08);
+    .now{
+      flex: 1 1 420px;
+      min-width: 280px;
     }
-    .episodeBox{
-      margin-top: 10px;
+    .viz{
+      flex: 1 1 420px;
+      min-width: 280px;
+      position:relative;
       border: 1px solid rgba(255,255,255,.10);
-      border-radius: 14px;
+      border-radius: 18px;
       overflow:hidden;
       background: rgba(0,0,0,.20);
     }
-    .epRow{
-      display:flex;
-      justify-content:space-between;
-      gap: 12px;
-      padding: 10px 12px;
-      border-bottom: 1px solid rgba(255,255,255,.08);
-      cursor:pointer;
-      user-select:none;
-      font-size: 13px;
+    canvas{ display:block; width:100%; height: 240px; }
+    .vizOverlay{
+      position:absolute; inset:0;
+      pointer-events:none;
+      background: radial-gradient(700px 250px at 50% 0%, rgba(245,194,75,.13), transparent 60%);
     }
-    .epRow:hover{ background: rgba(245,194,75,.10); }
-    .epRow.active{
-      background: linear-gradient(90deg, rgba(245,194,75,.95), rgba(215,165,58,.92));
-      color:#111;
-      font-weight: 700;
-    }
-    .epLeft{
-      min-width:0;
-      overflow:hidden;
-      white-space:nowrap;
-      text-overflow:ellipsis;
-      flex: 1 1 auto;
-    }
-    .epRight{
-      flex: 0 0 auto;
-      color: rgba(255,255,255,.55);
-      font-variant-numeric: tabular-nums;
-    }
-    .epRow.active .epRight{ color:#111; opacity:.85; }
 
-    /* Volume dots */
-    .volumeRow{
+    .titleLine{
+      font-weight: 800;
+      letter-spacing: .4px;
+      font-size: 14px;
+      margin: 2px 0 6px;
+    }
+    .metaLine{
+      font-size: 12px;
+      color: var(--muted);
+      margin: 0 0 12px;
+      min-height: 16px;
+    }
+    .playerRow{
+      display:flex;
+      align-items:flex-end;
+      gap:12px;
+    }
+    .controls{
+      flex:1;
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 18px;
+      padding: 12px;
+      background: rgba(0,0,0,.18);
+    }
+    .btnRow{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom: 10px;
+    }
+    .btn{
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.18);
+      color: var(--text);
+      cursor:pointer;
+      font-size: 13px;
+      letter-spacing: .5px;
+      user-select:none;
+    }
+    .btn:hover{ border-color: rgba(245,194,75,.55); }
+    .btn.primary{
+      border-color: rgba(245,194,75,.70);
+      background: rgba(245,194,75,.12);
+    }
+    .timeRow{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .range{
+      width:100%;
+      accent-color: var(--gold);
+    }
+
+    /* Vertical volume */
+    .volRail{
+      width: 52px;
       display:flex;
       align-items:center;
       justify-content:center;
-      gap: 14px;
-      padding: 10px 0 2px;
+      padding: 8px 6px;
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 18px;
+      background: rgba(0,0,0,.18);
     }
-    .volBtn{
-      width: 56px;
-      height: 56px;
+    .volMain{
+      height: 150px;
+      width: 28px;
+      writing-mode: vertical-lr;
+      direction: rtl;
+      accent-color: var(--gold);
+    }
+
+    /* Channel dock */
+    nav.dock{
+      margin-top: 12px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:center;
+    }
+    .dockBtn{
+      padding: 11px 14px;
       border-radius: 999px;
       border: 1px solid rgba(255,255,255,.14);
-      background:
-        radial-gradient(circle at 30% 30%, rgba(255,255,255,.18), transparent 55%),
-        linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.45));
-      box-shadow:
-        inset 0 1px 2px rgba(255,255,255,.12),
-        inset 0 -3px 6px rgba(0,0,0,.55),
-        0 12px 26px rgba(0,0,0,.55);
-      color: rgba(255,255,255,.9);
+      background: radial-gradient(circle at 30% 20%, rgba(255,255,255,.14), rgba(0,0,0,.42) 60%, rgba(0,0,0,.55));
+      color: rgba(255,255,255,.92);
       cursor:pointer;
-      font-size: 26px;
-      display:grid;
-      place-items:center;
+      font-size: 13px;
+      letter-spacing: .6px;
       user-select:none;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
     }
-    .volBtn:hover{ border-color: rgba(245,194,75,.55); }
-    .volDots{
-      display:flex;
-      gap: 8px;
-      align-items:center;
-    }
-    .dot{
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.25);
-      background: rgba(255,255,255,.10);
-    }
-    .dot.on{
-      background: rgba(255,255,255,.90);
-      border-color: rgba(255,255,255,.75);
-      box-shadow: 0 0 10px rgba(255,255,255,.18);
+    .dockBtn.active{
+      border-color: rgba(245,194,75,.85);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 0 0 3px rgba(245,194,75,.12);
     }
 
-    /* Search (channel filter) */
-    .searchWrap{
-      display:none;
-      gap: 10px;
-      align-items:center;
-      min-width: min(520px, 60vw);
+    /* Show mode panel */
+    .showPanel{
+      margin: 12px auto 0;
+      max-width: 820px;
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 18px;
+      background: rgba(0,0,0,.18);
+      padding: 12px;
     }
-    .searchWrap.open{ display:flex; }
-    .searchInput{
-      width: min(520px, 60vw);
-      max-width: 520px;
+    .row{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+      justify-content:center;
+    }
+    select.select{
+      width: min(560px, 100%);
+      max-width: 560px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.30);
+      color: var(--text);
+      font-size: 14px;
+    }
+    .smallNote{
+      margin-top: 8px;
+      text-align:center;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .episodeBox{
+      margin-top: 10px;
+      max-height: 340px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding-right: 6px;
+      border-top: 1px solid rgba(255,255,255,.08);
+    }
+    .epRow{
+      padding: 10px 10px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      cursor:pointer;
+      display:flex;
+      gap:12px;
+      justify-content:space-between;
+      align-items:flex-start;
+    }
+    .epRow:hover{ background: rgba(255,255,255,.03); }
+    .epRow.active{ background: rgba(245,194,75,.10); }
+    .epTitle{ font-size: 13px; font-weight: 700; }
+    .epMeta{ font-size: 12px; color: var(--muted); white-space:nowrap; }
+
+    /* Visualizer buttons */
+    .vizStrip{
+      display:flex;
+      justify-content:center;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.14);
+    }
+    .vizBtn{
       padding: 10px 12px;
       border-radius: 999px;
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.25);
-      color: rgba(255,255,255,.92);
-      outline:none;
-      box-shadow: inset 0 1px 2px rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.18);
+      color: rgba(255,255,255,.90);
+      cursor:pointer;
+      font-size: 13px;
+      user-select:none;
     }
-/* Compact mode: show more visualizer */
-body.compact .stageInner{
-  padding: 12px 12px 10px;
-  min-height: 240px;
-}
-body.compact .stageTopNote{ margin-bottom: 6px; }
-body.compact .nowLine{ margin-bottom: 8px; font-size: 18px; }
-body.compact .dividerSwirl{ margin: 6px 0 10px; }
-body.compact .trackTitle{
-  font-size: 18px;
-  letter-spacing: 1.6px;
-  margin: 0 0 8px;
-}
-body.compact .metaLine{ margin: 0 0 10px; }
-body.compact .audioWrap{ padding: 8px 10px 6px; }
-body.compact .playerBar{ padding: 8px 0 0; }
+    .vizBtn.active{ border-color: rgba(245,194,75,.80); }
 
-    @media (max-width: 640px){
-      .title{ font-size: 15px; }
-      .subtitle{ font-size: 11px; }
-      .trackTitle{ font-size: 20px; }
-      .chanTile{ width: 78px; }
-      .chanLabel{ font-size: 13px; }
-      .searchInput{ width: 52vw; }
-    }
-  
-    /* Collapsible player */
-    body.collapsed .stageInner{
-      padding: 10px 12px 8px;
-      min-height: 140px;
-    }
-    body.collapsed .stageTopNote,
-    body.collapsed .dividerSwirl,
-    body.collapsed #metaLine{
-      display:none !important;
-    }
-    body.collapsed .nowLine{
-      margin: 0 0 6px;
-      font-size: 16px;
-    }
-    body.collapsed .trackTitle{
-      margin: 0 0 6px;
-      font-size: 16px;
-      letter-spacing: 1.2px;
-      text-transform: none;
-      font-weight: 650;
-    }
-    body.collapsed .audioWrap{
-      margin-top: 0;
-      border-top: 0;
-      padding-top: 6px;
-    }
-
-    /* Browse panel under channels */
-    .browsePanel{
+    footer{
       margin-top: 14px;
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(0,0,0,.45));
-      box-shadow: 0 18px 60px rgba(0,0,0,.55);
-      padding: 14px;
-      display:none;
+      text-align:center;
+      font-size: 12px;
+      color: var(--muted);
     }
-    .browsePanel.open{ display:block; }
-    .browseHeader{
-      display:flex;
-      align-items:flex-end;
-      justify-content:space-between;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-    .browseHeader h2{
-      margin:0;
-      font-size: 16px;
-      letter-spacing:.2px;
-      color: rgba(255,255,255,.92);
-      text-decoration: underline;
-      text-underline-offset: 4px;
-      text-decoration-thickness: 2px;
-    }
-    .browseHeader .hint{
-      margin:0;
-      font-size:12px;
-      color: rgba(255,255,255,.62);
-    }
-
-  
-.playerRow{
-  display:flex;
-  align-items:flex-end;
-  gap:12px;
-}
-.volRail{
-  width: 52px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding-top: 6px;
-}
-.volMain{
-  height: 150px;
-  width: 28px;
-  writing-mode: vertical-lr;
-  direction: rtl;
-}
-body.compact .volMain{ height: 120px; }
-
-.mainModes{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-top: 12px;
-}
-.modeBtn{
-  padding: 12px 16px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,.14);
-  background: rgba(0,0,0,.22);
-  color: rgba(255,255,255,.92);
-  cursor:pointer;
-  font-size: 14px;
-  letter-spacing: .8px;
-}
-.modeBtn:hover{ border-color: rgba(245,194,75,.55); }
-.modeBtn.active{
-  border-color: rgba(245,194,75,.80);
-  box-shadow: 0 0 0 2px rgba(245,194,75,.14);
-}
-
-.showPickerPanel{
-  margin-top: 10px;
-  padding: 10px 12px;
-  border-radius: 16px;
-  border: 1px solid rgba(255,255,255,.10);
-  background: rgba(0,0,0,.14);
-}
-.showPickerPanel .select{ width:100%; }
-
-.vizStrip{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  margin-top: 10px;
-  padding: 10px 12px;
-  border-radius: 16px;
-  border: 1px solid rgba(255,255,255,.10);
-  background: rgba(0,0,0,.14);
-}
-.vizBtn{
-  padding: 10px 12px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,.12);
-  background: rgba(0,0,0,.18);
-  color: rgba(255,255,255,.90);
-  cursor:pointer;
-  font-size: 13px;
-}
-.vizBtn.active{ border-color: rgba(245,194,75,.80); }
-
-
-/* Smaller, cleaner show dropdown */
-.showPickerPanel .select,
-#showSelectInline{
-  max-width: 420px;
-  width: 100%;
-  font-size: 14px;
-  padding: 10px 12px;
-}
-@media (max-width: 520px){
-  .showPickerPanel .select,
-  #showSelectInline{
-    max-width: 100%;
-    font-size: 15px;
-  }
-}
-
-
-/* Episode list should be scrollable, not page-filling */
-.episodeBox{
-  max-height: 320px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding-right: 6px;
-  border-top: 1px solid rgba(255,255,255,.08);
-  margin-top: 10px;
-}
-@media (max-width: 520px){
-  .episodeBox{ max-height: 40vh; }
-}
-
-
-.modePills{
-  display:flex;
-  justify-content:center;
-  gap:14px;
-  margin: 12px auto 10px;
-  flex-wrap:wrap;
-}
-.pillBtn{
-  padding: 12px 18px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,.16);
-  background: radial-gradient(circle at 30% 20%, rgba(255,255,255,.18), rgba(0,0,0,.38) 55%, rgba(0,0,0,.55));
-  color: rgba(255,255,255,.92);
-  cursor:pointer;
-  font-size: 14px;
-  letter-spacing: .8px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.10), 0 8px 24px rgba(0,0,0,.35);
-}
-.pillBtn:hover{ border-color: rgba(245,194,75,.55); }
-.pillBtn.active{
-  border-color: rgba(245,194,75,.85);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.10), 0 0 0 3px rgba(245,194,75,.12), 0 10px 30px rgba(0,0,0,.40);
-}
-
-.showPickerPanel{
-  margin: 6px auto 0;
-  padding: 10px 12px;
-  border-radius: 16px;
-  border: 1px solid rgba(255,255,255,.10);
-  background: rgba(0,0,0,.14);
-  max-width: 520px;
-}
-#showSelectInline{
-  max-width: 420px;
-  width: 100%;
-  font-size: 14px;
-  padding: 10px 12px;
-}
-
-.vizStrip{
-  display:flex;
-  justify-content:center;
-  gap:8px;
-  flex-wrap:wrap;
-  margin-top: 10px;
-  padding: 10px 12px;
-  border-radius: 16px;
-  border: 1px solid rgba(255,255,255,.10);
-  background: rgba(0,0,0,.14);
-}
-.vizBtn{
-  padding: 10px 12px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,.12);
-  background: rgba(0,0,0,.18);
-  color: rgba(255,255,255,.90);
-  cursor:pointer;
-  font-size: 13px;
-}
-.vizBtn.active{ border-color: rgba(245,194,75,.80); }
-
-.playerRow{
-  display:flex;
-  align-items:flex-end;
-  gap:12px;
-}
-.volRail{
-  width: 52px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding-top: 6px;
-}
-.volMain{
-  height: 150px;
-  width: 28px;
-  writing-mode: vertical-lr;
-  direction: rtl;
-}
-
-</style>
+  </style>
 </head>
 
 <body>
-  <canvas id="vizCanvas"></canvas>
-
-  <div class="app">
-    <header class="topbar">
-      <div class="topLeft">
-        <button class="iconBtn" id="btnSearch" title="Search in current channel">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" stroke="currentColor" stroke-width="2"/>
-            <path d="M16.5 16.5 21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </button>
-
-        <div class="brand">
-          <div class="logo" title="Golden Radio Hour" aria-hidden="true"></div>
-          <div class="titleWrap">
-            <div class="title">Old Time Radio Archive — Hosted by Golden Radio Hour</div>
-            <div class="subtitle" id="modeSubtitle">Mode: Channel Radio</div>
-          </div>
-        </div>
-
-        <div class="searchWrap" id="searchWrap">
-          <input id="searchInput" class="searchInput" placeholder="Filter current channel..." />
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo">📻</div>
+        <div>
+          <h1>Old Time Radio Archive</h1>
+          <div class="sub">hosted by Golden Radio Hour</div>
         </div>
       </div>
-
-      <div class="topRight">
-        <button class="iconBtn" id="btnCollapse" title="Collapse/Expand Player">
-          <svg id="collapseIcon" width="22" height="22" viewBox="0 0 24 24" fill="none">
-            <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-
-        <button class="iconBtn" id="btnMenu" title="Menu">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-            <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </button>
-      </div>
+      <div style="font-size:12px;color:rgba(255,255,255,.70);">Simple. Big buttons. Easy listening.</div>
     </header>
 
-    <main class="stage">
-      <div class="stageInner">
-        <p class="stageTopNote" id="stageNote">SELECT A CHANNEL</p>
+    <div class="modePills" id="modePills">
+      <button class="pillBtn active" id="pillListenChannel" type="button">Listen to Channel</button>
+      <button class="pillBtn" id="pillListenShow" type="button">Listen by Show</button>
+    </div>
 
-        <div class="nowLine" id="nowLine">
-          Now Playing on <strong id="channelName">—</strong>
-        </div>
+    <div class="card">
+      <div class="topRow">
+        <div class="now">
+          <div class="titleLine" id="nowTitle">Loading…</div>
+          <div class="metaLine" id="nowMeta"> </div>
 
-        <svg class="dividerSwirl" viewBox="0 0 300 28" fill="none" aria-hidden="true">
-          <path d="M10 14c26-18 42 18 68 0s42 18 68 0 42 18 68 0 42 18 68 0 42 18 68 0"
-                stroke="rgba(255,255,255,.72)" stroke-width="2" stroke-linecap="round"/>
-          <path d="M70 14c14-10 22 10 36 0s22 10 36 0 22 10 36 0"
-                stroke="rgba(255,255,255,.45)" stroke-width="2" stroke-linecap="round"/>
-        </svg>
+          <div class="playerRow">
+            <div class="controls">
+              <div class="btnRow">
+                <button class="btn" id="btnPrev" type="button">⟵ Prev</button>
+                <button class="btn primary" id="btnPlay" type="button">Play</button>
+                <button class="btn" id="btnNext" type="button">Next ⟶</button>
+                <button class="btn" id="btnStop" type="button">Stop</button>
+              </div>
 
-        <div class="trackTitle" id="trackTitle">—</div>
-        <div class="metaLine" id="metaLine">—</div>
+              <input class="range" id="seek" type="range" min="0" max="1000" value="0" />
 
-        <div class="audioWrap">
-          <audio id="audio" preload="none"></audio>
+              <div class="timeRow">
+                <div id="tCur">0:00</div>
+                <div style="flex:1"></div>
+                <div id="tDur">0:00</div>
+              </div>
+            </div>
 
-<div class="playerBar" id="playerBar" aria-label="Player controls">
-  <button class="pbtn" id="btnPrev" type="button" title="Previous (episode/channel item)">⟵</button>
-  <button class="pbtn" id="btnPlay" type="button" title="Play/Pause">▶</button>
-  <button class="pbtn" id="btnNext" type="button" title="Next (episode/channel item)">⟶</button>
-
-  <div class="ptime" id="timeNow">0:00</div>
-
-  <input id="seek" class="seek" type="range" min="0" max="1000" value="0" step="1" aria-label="Seek" />
-
-  <div class="ptime" id="timeTotal">0:00</div>
-</div>
-          <div class="tinyHint" id="statusHint">
-            Tip: pick a channel below for continuous play, or open Menu → Browse by Show.
-          </div>
-        </div>
-      </div>
-    </main>
-
-    <nav class="dock" aria-label="Channels">
-      <div class="dockRow" id="dockRow"></div>
-    </nav>
-
-
-    <section class="browsePanel" id="browsePanel" aria-label="Browse by Show Panel">
-      <div class="browseHeader"><h2>Browse by Show</h2><p class="hint">Pick a show, then use the episode list or the Prev/Next buttons.</p></div>
-          <div style="font-size:12px;color:rgba(255,255,255,.62);">
-              Works in <b>Browse by Show</b> after you pick a show.
+            <div class="volRail" title="Volume">
+              <input id="volMain" class="volMain" type="range" min="0" max="1" step="0.01" value="0.6" aria-label="Volume" />
             </div>
           </div>
 
-          <div class="row">
-            <select id="showSelect">
-              <option value="__all__">Select a show…</option>
-            </select>
+          <nav class="dock" id="dock" aria-label="Channels"></nav>
+        </div>
 
-            </div>
+        <div class="viz">
+          <canvas id="vizCanvas" width="900" height="300"></canvas>
+          <div class="vizOverlay"></div>
 
-          <div class="episodeBox" id="episodeBox" class="episodeBox"></div>
-        
-    </section>
-
-  </div>
-
-  <!-- Modal -->
-  <div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-label="Menu">
-    <div class="modal">
-      <div class="modalTop">
-        <div class="modalTitle">Menu</div>
-        <button class="closeBtn" id="btnClose" title="Close">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </button>
+          <div class="vizStrip" id="vizStrip">
+            <button class="vizBtn active" data-viz="none" type="button">Off</button>
+            <button class="vizBtn" data-viz="wave" type="button">Wave</button>
+            <button class="vizBtn" data-viz="bars" type="button">Bars</button>
+            <button class="vizBtn" data-viz="ring" type="button">Ring</button>
+            <button class="vizBtn" data-viz="particles" type="button">Particles</button>
+          </div>
+        </div>
       </div>
 
-      <div class="modalBody">
-        <div class="section">
-          <h3>Modes</h3>
-          <p>Switch between radio-style channel play and classic show browsing.</p>
-          <div class="pillRow" id="modeRow">
-            <div class="pill active" data-mode="channel">Channel Radio</div>
-            <div class="pill" data-mode="show">Browse by Show</div>
-          </div>
+      <div class="showPanel" id="showPanel" style="display:none;">
+        <div class="row">
+          <select id="showSelectInline" class="select">
+            <option value="__all__">Select a show…</option>
+          </select>
         </div>
-
-        <div class="section" id="channelSection">
-          <h3>Schedule</h3>
-          <p>What’s next in the current channel rotation.</p>
-          <div class="pillRow" id="modalChannelRow"></div>
-          
-        </div>
-
-        <div class="section">
-          <h3>Visualizers</h3>
-          <p>Pick a visualizer. (First click anywhere may be required by your browser to enable audio analysis.)</p>
-          <div class="pillRow" id="vizRow">
-            <div class="pill active" data-viz="none">None</div>
-            <div class="pill" data-viz="osc">Oscilloscope</div>
-            <div class="pill" data-viz="bars">Spectrum Bars</div>
-            <div class="pill" data-viz="radial">Radial Pulse</div>
-            <div class="pill" data-viz="phono">Phonograph</div>
-            <div class="pill" data-viz="particles">Particles</div>
-          </div>
-          <p style="margin-top:10px;color:rgba(255,255,255,.60);font-size:12px;">
-            If the visualizer looks flat, your MP3 host may need CORS enabled. If MP3s are on the same domain, you’re good.
-          </p>
-        </div>
-
-        <div class="section">
-  <h3>Player Size</h3>
-  <p>Compact mode shows more of the visualizer.</p>
-  <div class="pillRow" id="sizeRow">
-    <div class="pill active" data-size="normal">Normal</div>
-    <div class="pill" data-size="compact">Compact</div>
-  </div>
-</div>
-
-        <div class="section">
-          <h3>Volume</h3>
-          <p>Step volume up/down.</p>
-          <div class="volumeRow">
-            <div class="volBtn" id="volDown" aria-label="Volume down">−</div>
-            <div class="volDots" id="volDots"></div>
-            <div class="volBtn" id="volUp" aria-label="Volume up">+</div>
-          </div>
-        </div>
-
+        <div class="smallNote">Pick a show to start (no autoplay until you choose). Then use Prev/Next to skip episodes.</div>
+        <div class="episodeBox" id="episodeBox"></div>
       </div>
     </div>
+
+    <footer>
+      Tip: If you prefer browsing by program, tap <b>Listen by Show</b>. For easy “radio-style” listening, tap <b>Listen to Channel</b>.
+    </footer>
   </div>
 
-<script>
-/* =========================
-   CONFIG
-========================= */
-const DATA_URL = "./shows.json";
+  <audio id="audio" preload="none" crossorigin="anonymous"></audio>
 
-const CHANNELS = [
-  "Future","Action","Crime","Horror","Suspense","Western","Comedy","Drama","Sports"
-];
+  <script>
+  "use strict";
 
-// Best long-term: keep expanding this until it covers your shows.
-const SHOW_TO_CHANNEL = {};
-
-
-/* =========================
-   STATE
-========================= */
-let allTracks = [];
-let tracksByChannel = {};
-let showsList = [];
-
-let mode = "channel";            // "channel" or "show"
-let currentChannel = "Suspense";
-let channelQueue = [];
-let channelIndex = 0;
-let searchQuery = "";
-
-let currentShow = null;
-let showTracks = [];
-let currentKey = null;
-
-const audioEl = document.getElementById("audio");
-const volMain = document.getElementById("volMain");
-function syncVolMain(){ if (volMain) volMain.value = String(audioEl.volume); }
-volMain?.addEventListener("input", () => { audioEl.volume = Number(volMain.value); });
-
-
-const btnPrev = document.getElementById("btnPrev");
-const btnPlay = document.getElementById("btnPlay");
-const btnNext = document.getElementById("btnNext");
-const seek = document.getElementById("seek");
-const timeNow = document.getElementById("timeNow");
-const timeTotal = document.getElementById("timeTotal");
-
-let isSeeking = false;
-
-function fmtTime(s){
-  if (!Number.isFinite(s) || s < 0) return "0:00";
-  s = Math.floor(s);
-  const m = Math.floor(s/60);
-  const r = s%60;
-  return `${m}:${String(r).padStart(2,"0")}`;
-}
-
-function syncPlayIcon(){
-  btnPlay.textContent = audioEl.paused ? "▶" : "❚❚";
-}
-
-btnPlay.addEventListener("click", () => {
-  if (!audioEl.src) return;
-  if (audioEl.paused) audioEl.play().catch(()=>{});
-  else audioEl.pause();
-});
-
-audioEl.addEventListener("play", syncPlayIcon);
-audioEl.addEventListener("pause", syncPlayIcon);
-
-audioEl.addEventListener("loadedmetadata", () => {
-  timeTotal.textContent = fmtTime(audioEl.duration);
-});
-
-audioEl.addEventListener("timeupdate", () => {
-  timeNow.textContent = fmtTime(audioEl.currentTime);
-  if (!isSeeking && Number.isFinite(audioEl.duration) && audioEl.duration > 0){
-    seek.value = String(Math.round((audioEl.currentTime / audioEl.duration) * 1000));
+  // ---------- helpers ----------
+  function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
+  function escapeHtml(str){
+    return String(str ?? "")
+      .replace(/&/g,"&amp;")
+      .replace(/</g,"&lt;")
+      .replace(/>/g,"&gt;")
+      .replace(/"/g,"&quot;")
+      .replace(/'/g,"&#39;");
   }
-});
-
-seek.addEventListener("input", () => { isSeeking = true; });
-seek.addEventListener("change", () => {
-  if (!Number.isFinite(audioEl.duration) || audioEl.duration <= 0) { isSeeking = false; return; }
-  const pct = Number(seek.value) / 1000;
-  audioEl.currentTime = pct * audioEl.duration;
-  isSeeking = false;
-});
-
-/* Unified skip (buttons live by the progress bar) */
-function currentShowIndex(){
-  if (!currentKey || !currentKey.startsWith("show|")) return 0;
-  const parts = currentKey.split("|");
-  const idx = parseInt(parts[2] || "0", 10);
-  return Number.isFinite(idx) ? idx : 0;
-}
-
-btnPrev.addEventListener("click", () => {
-  if (mode === "show"){
-    playShowIndex(currentShowIndex() - 1, true);
-  } else {
-    if (!channelQueue.length) return;
-    const prev = (channelIndex - 1 + channelQueue.length) % channelQueue.length;
-    loadChannelIndex(prev, true);
+  function safeShow(el, on){
+    if(!el) return;
+    el.style.display = on ? "" : "none";
   }
-});
-
-btnNext.addEventListener("click", () => {
-  if (mode === "show"){
-    playShowIndex(currentShowIndex() + 1, true);
-  } else {
-    if (!channelQueue.length) return;
-    const nxt = (channelIndex + 1) % channelQueue.length;
-    loadChannelIndex(nxt, true);
-  }
-});
-
-/* Player size */
-document.querySelectorAll("#sizeRow .pill").forEach(p => {
-  p.addEventListener("click", () => {
-    document.querySelectorAll("#sizeRow .pill").forEach(x => x.classList.remove("active"));
-    p.classList.add("active");
-    document.body.classList.toggle("compact", p.dataset.size === "compact");
-  });
-});
-
-// IMPORTANT for visualizers with remote audio (requires CORS headers on the MP3 host)
-audioEl.crossOrigin = "anonymous";
-
-const channelNameEl = document.getElementById("channelName");
-const trackTitleEl = document.getElementById("trackTitle");
-const metaLineEl = document.getElementById("metaLine");
-const statusHintEl = document.getElementById("statusHint");
-const stageNoteEl = document.getElementById("stageNote");
-const modeSubtitleEl = document.getElementById("modeSubtitle");
-
-const dockRowEl = document.getElementById("dockRow");
-const modalChannelRowEl = document.getElementById("modalChannelRow");
-const overlayEl = document.getElementById("overlay");
-const btnMenu = document.getElementById("btnMenu");
-const btnCollapse = document.getElementById("btnCollapse");
-const collapseIcon = document.getElementById("collapseIcon");
-
-const btnClose = document.getElementById("btnClose");
-
-const btnSearch = document.getElementById("btnSearch");
-const searchWrap = document.getElementById("searchWrap");
-const searchInput = document.getElementById("searchInput");
-
-const volDotsEl = document.getElementById("volDots");
-const volDown = document.getElementById("volDown");
-const volUp = document.getElementById("volUp");
-
-const modeRow = document.getElementById("modeRow");
-const channelSection = document.getElementById("channelSection");
-const showSection = document.getElementById("showSection");
-
-const showSelect = document.getElementById("showSelect");
-const pillListenChannel = document.getElementById("pillListenChannel");
-const pillListenShow = document.getElementById("pillListenShow");
-const showPickerPanel = document.getElementById("showPickerPanel");
-const showSelectInline = document.getElementById("showSelectInline");
-const vizStrip = document.getElementById("vizStrip");
-const btnModeChannel = document.getElementById("btnModeChannel");
-const btnModeShow = document.getElementById("btnModeShow");
-const episodeBox = document.getElementById("episodeBox");
-const browsePanel = document.getElementById("browsePanel");
-
-
-
-
-/* =========================
-   HELPERS
-========================= */
-function norm(s){ return (s || "").toString().toLowerCase(); }
-
-function formatTime(seconds){
-  if (!Number.isFinite(seconds)) return "";
-  seconds = Math.max(0, Math.floor(seconds));
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = seconds % 60;
-  const pad = n => String(n).padStart(2,"0");
-  return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
-}
-
-function titleOf(t){ return t.displayTitle || t.title || "Untitled"; }
-
-function inferredChannel(track){
-  if (track.channel && CHANNELS.includes(track.channel)) return track.channel;
-
-  const show = track.show || track.showTitle || "";
-  if (SHOW_TO_CHANNEL[show]) return SHOW_TO_CHANNEL[show];
-
-  const hay = [
-    track.show, track.showTitle, track.title, track.displayTitle, track.genre,
-    Array.isArray(track.tags) ? track.tags.join(" ") : ""
-  ].map(norm).join(" ");
-
-  if (/(sci[- ]?fi|science fiction|x[- ]?minus[- ]?one|dimension x|space|alien|robot|future|asimov|wells|bradbury)/i.test(hay)) return "Future";
-  if (/(horror|ghost|chiller|terror|macabre|haunt|nightmare|vampire|werewolf|monster)/i.test(hay)) return "Horror";
-  if (/(crime|detective|murder|police|dragnet|noir|marlowe|private eye|case|robbery|heist)/i.test(hay)) return "Crime";
-  if (/(suspense|hitchcock|thriller|mystery|molle|mystery theatre|whistler)/i.test(hay)) return "Suspense";
-  if (/(western|gunsmoke|cowboy|ranger|frontier|six shooter)/i.test(hay)) return "Western";
-  if (/(comedy|funny|fibber|mcgee|skelton|variety|sitcom)/i.test(hay)) return "Comedy";
-  if (/(sports|baseball|boxing|football|basketball|race)/i.test(hay)) return "Sports";
-  if (/(action|adventure|spy|secret agent|war|battle|mission)/i.test(hay)) return "Action";
-  return "Drama";
-}
-
-function shuffle(arr){
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--){
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-function applySearch(tracks, q){
-  q = norm(q).trim();
-  if (!q) return tracks;
-  return tracks.filter(t => {
-    const hay = [
-      t.channel, t.show, t.showTitle, t.title, t.displayTitle, t.genre,
-      Array.isArray(t.tags) ? t.tags.join(" ") : ""
-    ].map(norm).join(" ");
-    return hay.includes(q);
-  });
-}
-
-function uniqueShows(tracks){
-  const set = new Set();
-  tracks.forEach(t => set.add(t.show || "Unknown"));
-  return [...set].sort((a,b)=>a.localeCompare(b));
-}
-
-function setActiveDock(){
-  document.querySelectorAll(".chanTile").forEach(el => {
-    el.classList.toggle("active", el.dataset.channel === currentChannel);
-  });
-  document.querySelectorAll("#modalChannelRow .pill").forEach(el => {
-    el.classList.toggle("active", el.dataset.channel === currentChannel);
-  });
-}
-
-const safeShow = (el, show) => { if (el) el.style.display = show ? "" : "none"; };
-
-function setModeUI(){
-  document.querySelectorAll("#modeRow .pill").forEach(p => p.classList.remove("active"));
-  const active = modeRow.querySelector(`[data-mode="${mode}"]`);
-  if (active) active.classList.add("active");
-
-  channelSection.style.display = (mode === "channel") ? "" : "none";
-  safeShow(showSection, false);
-
-  // Browse panel under channels
-  if (browsePanel) browsePanel.classList.toggle("open", mode === "show");
-
-  if (mode === "channel"){
-    modeSubtitleEl.textContent = "Mode: Channel Radio";
-    stageNoteEl.textContent = "SELECT A CHANNEL";
-  } else {
-    modeSubtitleEl.textContent = "Mode: Browse by Show";
-    stageNoteEl.textContent = "BROWSE BY SHOW";
-    channelNameEl.textContent = currentShow ? currentShow : "Select a show";
-  }
-}
-
-/* =========================
-   CHANNEL MODE
-========================= */
-function buildChannelQueue(channel){
-  const base = tracksByChannel[channel] || [];
-  const filtered = applySearch(base, searchQuery);
-  return shuffle(filtered);
-}
-
-function renderNowPlaying(track){
-  if (mode === "channel"){
-    channelNameEl.textContent = `The ${currentChannel} Channel`;
-  } else {
-    channelNameEl.textContent = currentShow ? currentShow : "Select a show";
+  function fmtTime(sec){
+    sec = Math.max(0, Math.floor(sec || 0));
+    const m = Math.floor(sec/60);
+    const s = sec%60;
+    return `${m}:${String(s).padStart(2,"0")}`;
   }
 
-  if (!track){
-    trackTitleEl.textContent = "—";
-    metaLineEl.textContent = "—";
-    return;
-  }
-
-  trackTitleEl.textContent = titleOf(track);
-
-  const show = track.show || track.showTitle || "Unknown Show";
-  const len = formatTime(track.durationSeconds);
-  const extras = [];
-  extras.push(`Show: ${show}`);
-  if (mode === "channel") extras.push(`Channel: ${inferredChannel(track)}`);
-  if (len) extras.push(`Length: ${len}`);
-  metaLineEl.textContent = extras.join(" • ");
-}
-
-
-function loadChannelIndex(i, autoplay){
-  if (!channelQueue.length) return;
-  channelIndex = Math.max(0, Math.min(i, channelQueue.length - 1));
-  const t = channelQueue[channelIndex];
-  currentKey = `channel|${currentChannel}|${channelIndex}`;
-
-  audioEl.src = t.url;
-  renderNowPlaying(t);
-statusHintEl.textContent =
-    `Channel: ${currentChannel} • ${channelQueue.length} item(s) in rotation` +
-    (searchQuery ? " • filtered" : "") +
-    " • Menu → Browse by Show for manual picking";
-
-  if (autoplay) audioEl.play().catch(()=>{});
-}
-
-function switchChannel(channel, autoplay){
-  mode = "channel";
-  setModeUI();
-
-  currentChannel = channel;
-  channelQueue = buildChannelQueue(currentChannel);
-  channelIndex = 0;
-
-  setActiveDock();
-  renderNowPlaying(channelQueue[0] || null);
-if (channelQueue.length){
-    audioEl.src = channelQueue[0].url;
-    if (autoplay) audioEl.play().catch(()=>{});
-  } else {
-    audioEl.removeAttribute("src");
-  }
-}
-
-/* =========================
-   SHOW MODE
-========================= */
-function renderShowSelect(){
-  const shows = showsList;
-  showSelect.innerHTML = `<option value="__all__">Select a show…</option>`;
-  if (showSelectInline) showSelectInline.innerHTML = `<option value="__all__">Select a show…</option>`;
-  if (showSelectInline) showSelectInline.innerHTML = `<option value="__all__">Select a show…</option>`;
-  for (const show of shows){
-    const opt = document.createElement("option");
-    opt.value = show;
-    opt.textContent = show;
-    showSelect.appendChild(opt);
-    if (showSelectInline) showSelectInline.appendChild(opt.cloneNode(true));
-    if (showSelectInline) showSelectInline.appendChild(opt.cloneNode(true));
-  }
-}
-
-function setActiveEpisode(key){
-  episodeBox.querySelectorAll(".epRow.active").forEach(x => x.classList.remove("active"));
-  const el = episodeBox.querySelector(`[data-key="${CSS.escape(key)}"]`);
-  if (el) el.classList.add("active");
-}
-
-function buildShowTracks(showName){
-  const list = allTracks
-    .filter(t => (t.show || "Unknown") === showName)
-    .sort((a,b) => norm(titleOf(a)).localeCompare(norm(titleOf(b))));
-  return list;
-}
-
-
-function playShowIndex(i, autoplay=true){
-  if (!currentShow || !showTracks.length) return;
-  i = (i + showTracks.length) % showTracks.length;
-
-  const t = showTracks[i];
-  currentKey = `show|${currentShow}|${i}`;
-
-  mode = "show";
-  setModeUI();
-
-  audioEl.src = t.url;
-  renderNowPlaying(t);
-  statusHintEl.textContent = `Show: ${currentShow} • ${showTracks.length} episode(s) total • Use channel dock anytime to go back to radio mode`;
-
-  // If the episode list is filtered, active highlight may not match; we still highlight by key when present.
-  setActiveEpisode(currentKey);
-
-  if (autoplay) audioEl.play().catch(()=>{});
-}
-
-
-
-
-function escapeHtml(str){
-  return String(str ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
-
-function renderEpisodes(){
-  episodeBox.innerHTML = "";
-  if (!currentShow){
-    episodeBox.innerHTML = `<div style="padding:12px;color:rgba(255,255,255,.70)">Pick a show to see episodes.</div>`;
-    return;
-  }
-
-  const filtered = showTracks.slice(); // no text filter box
-
-  if (!filtered.length){
-    episodeBox.innerHTML = `<div style="padding:12px;color:rgba(255,255,255,.70)">No episodes found for this show.</div>`;
-    return;
-  }
-
-  filtered.forEach((t) => {
-    const idx = showTracks.indexOf(t);
-    const key = `show|${currentShow}|${idx}`;
-
-    const row = document.createElement("div");
-    row.className = "epRow" + (key === currentKey ? " active" : "");
-    row.dataset.key = key;
-    row.innerHTML = `<div class="epTitle">${escapeHtml(t.title || "Untitled")}</div>
-      <div class="epMeta">${escapeHtml(t.date || "")}</div>`;
-
-    row.addEventListener("click", () => {
-      playShowIndex(idx, true);
-    });
-
-    episodeBox.appendChild(row);
-  });
-}
-
-function enterShowMode(){
-  mode = "show";
-  setModeUI();
-  statusHintEl.textContent = "Pick a show, then click an episode to play. Use channel dock anytime to go back to radio mode.";
-}
-
-showSelect.addEventListener("change", () => {
-  setModeFromUI("show");
-  const v = showSelect.value;
-  if (v === "__all__"){
-    currentShow = null;
-    showTracks = [];
-    renderEpisodes();
-    renderNowPlaying(null);
-    return;
-  }
-  currentShow = v;
-  showTracks = buildShowTracks(currentShow);
-  renderEpisodes();
-  renderNowPlaying(showTracks[0] || null);
-});
-
-/* =========================
-   UI WIRING
-========================= */
-audioEl.addEventListener("ended", () => {
-  if (mode !== "channel") return;
-  if (!channelQueue.length) return;
-  channelIndex++;
-  if (channelIndex >= channelQueue.length){
-    channelQueue = shuffle(channelQueue);
-    channelIndex = 0;
-  }
-  loadChannelIndex(channelIndex, true);
-});
-
-function openModal(){ overlayEl.classList.add("open"); }
-function closeModal(){ overlayEl.classList.remove("open"); }
-
-btnMenu.addEventListener("click", openModal);
-btnClose.addEventListener("click", closeModal);
-
-btnCollapse?.addEventListener("click", () => {
-  const isCollapsed = document.body.classList.toggle("collapsed");
-  // flip icon (down vs up)
-  if (collapseIcon){
-    collapseIcon.innerHTML = isCollapsed
-      ? '<path d="M6 15l6-6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'
-      : '<path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
-  }
-});
-
-overlayEl.addEventListener("click", (e) => { if (e.target === overlayEl) closeModal(); });
-
-btnSearch.addEventListener("click", () => {
-  searchWrap.classList.toggle("open");
-  if (searchWrap.classList.contains("open")){
-    searchInput.focus();
-  } else {
-    searchInput.value = "";
-    searchQuery = "";
-    if (mode === "channel") switchChannel(currentChannel, false);
-  }
-});
-
-searchInput.addEventListener("input", () => {
-  searchQuery = searchInput.value || "";
-  if (mode === "channel") switchChannel(currentChannel, false);
-});
-
-// Mode pills
-document.querySelectorAll("#modeRow .pill").forEach(p => {
-  p.addEventListener("click", () => {
-    const m = p.dataset.mode;
-    if (m === "channel"){
-      switchChannel(currentChannel, false);
-    } else {
-      enterShowMode();
-    }
-  });
-});
-
-/* =========================
-   VOLUME DOTS
-========================= */
-const VOL_STEPS = 10;
-function setVolume(v){
-  audioEl.volume = clamp(v, 0, 1);
-  volSlider.value = String(audioEl.volume);
-  syncVolMain();
-}
-function renderVolDots(){
-  volDotsEl.innerHTML = "";
-  const onCount = Math.round(audioEl.volume * VOL_STEPS);
-  for (let i = 1; i <= VOL_STEPS; i++){
-    const dot = document.createElement("div");
-    dot.className = "dot" + (i <= onCount ? " on" : "");
-    volDotsEl.appendChild(dot);
-  }
-}
-volDown.addEventListener("click", () => setVolume(audioEl.volume - (1/VOL_STEPS)));
-volUp.addEventListener("click", () => setVolume(audioEl.volume + (1/VOL_STEPS)));
-
-/* =========================
-   RENDER DOCK + MODAL CHANNELS
-========================= */
-function renderDock(){
-  dockRowEl.innerHTML = "";
-  CHANNELS.forEach(ch => {
-    const tile = document.createElement("div");
-    tile.className = "chanTile";
-    tile.dataset.channel = ch;
-
-    const orb = document.createElement("div");
-    orb.className = "chanOrb";
-
-    const label = document.createElement("div");
-    label.className = "chanLabel";
-    label.textContent = ch;
-
-    tile.appendChild(orb);
-    tile.appendChild(label);
-    tile.addEventListener("click", () => switchChannel(ch, true));
-
-    dockRowEl.appendChild(tile);
-  });
-}
-
-function renderModalChannels(){
-  modalChannelRowEl.innerHTML = "";
-  CHANNELS.forEach(ch => {
-    const pill = document.createElement("div");
-    pill.className = "pill";
-    pill.dataset.channel = ch;
-    pill.textContent = ch;
-    pill.addEventListener("click", () => switchChannel(ch, false));
-    modalChannelRowEl.appendChild(pill);
-  });
-}
-
-/* =========================
-   VISUALIZERS (5 modes)
-   - osc: waveform
-   - bars: classic spectrum
-   - radial: radial spectrum
-   - phono: spinning record + pulse
-   - particles: audio-reactive particles
-========================= */
-const vizCanvas = document.getElementById("vizCanvas");
-const vizCtx = vizCanvas.getContext("2d");
-
-let vizMode = "none";
-let audioCtx = null;
-let analyser = null;
-let srcNode = null;
-let freqData = null;
-let timeData = null;
-let vizRAF = null;
-
-let particles = [];
-let phonoSpin = 0;
-
-function resizeViz(){
-  const dpr = window.devicePixelRatio || 1;
-  vizCanvas.width = Math.floor(window.innerWidth * dpr);
-  vizCanvas.height = Math.floor(window.innerHeight * dpr);
-  vizCtx.setTransform(dpr,0,0,dpr,0,0);
-}
-window.addEventListener("resize", resizeViz);
-resizeViz();
-
-// Some browsers require a user gesture to start AudioContext
-document.addEventListener("click", () => {
-  if (audioCtx && audioCtx.state === "suspended") audioCtx.resume().catch(()=>{});
-}, { once:false });
-
-function ensureAudioGraph(){
-  if (audioCtx) return;
-
-  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  analyser = audioCtx.createAnalyser();
-  analyser.fftSize = 2048;
-  analyser.smoothingTimeConstant = 0.86;
-
-  srcNode = audioCtx.createMediaElementSource(audioEl);
-  srcNode.connect(analyser);
-  analyser.connect(audioCtx.destination);
-
-  freqData = new Uint8Array(analyser.frequencyBinCount);
-  timeData = new Uint8Array(analyser.fftSize);
-}
-
-function setVisualizer(mode){
-  vizMode = mode || "none";
-
-  document.querySelectorAll("#vizRow .pill").forEach(x => x.classList.remove("active"));
-  const pill = document.querySelector(`#vizRow .pill[data-viz="${vizMode}"]`);
-  if (pill) pill.classList.add("active");
-
-  if (vizMode === "none"){
-    stopViz();
-    vizCanvas.style.display = "none";
-    statusHintEl.textContent = statusHintEl.textContent.replace(" • Visualizer ON", "");
-    return;
-  }
-
-  vizCanvas.style.display = "block";
-  ensureAudioGraph();
-  initVizMode();
-  startViz();
-  if (!statusHintEl.textContent.includes("Visualizer ON")){
-    statusHintEl.textContent += " • Visualizer ON";
-  }
-}
-
-function initVizMode(){
-  if (vizMode === "particles"){
-    particles = [];
-    const count = Math.min(160, Math.max(80, Math.floor(window.innerWidth / 10)));
-    for (let i=0;i<count;i++){
-      particles.push({
-        x: Math.random()*window.innerWidth,
-        y: Math.random()*window.innerHeight,
-        vx: (Math.random()*2-1)*0.25,
-        vy: (Math.random()*2-1)*0.25,
-        r: 1 + Math.random()*2.5,
-        a: 0.20 + Math.random()*0.35
-      });
-    }
-  }
-}
-
-function startViz(){
-  if (vizRAF) return;
-  const loop = () => {
-    vizRAF = requestAnimationFrame(loop);
-    drawViz();
-  };
-  loop();
-}
-
-function stopViz(){
-  if (!vizRAF) return;
-  cancelAnimationFrame(vizRAF);
-  vizRAF = null;
-  vizCtx.clearRect(0,0,window.innerWidth,window.innerHeight);
-}
-
-function avgEnergy(bins, start, end){
-  start = Math.max(0, Math.min(bins.length-1, start));
-  end = Math.max(0, Math.min(bins.length-1, end));
-  if (end <= start) return 0;
-  let sum = 0;
-  for (let i=start;i<end;i++) sum += bins[i];
-  return sum / (end-start) / 255;
-}
-
-function drawViz(){
-  const w = window.innerWidth;
-  const h = window.innerHeight;
-
-  vizCtx.clearRect(0,0,w,h);
-
-  if (!analyser) return;
-
-  // Slight vignette so the visuals look classy
-  const g = vizCtx.createRadialGradient(w/2,h/2,0,w/2,h/2,Math.max(w,h)*0.55);
-  g.addColorStop(0, "rgba(0,0,0,0)");
-  g.addColorStop(1, "rgba(0,0,0,0.25)");
-  vizCtx.fillStyle = g;
-  vizCtx.fillRect(0,0,w,h);
-
-  if (vizMode === "osc"){
-    analyser.getByteTimeDomainData(timeData);
-    drawOsc(timeData, w, h);
-  } else if (vizMode === "bars"){
-    analyser.getByteFrequencyData(freqData);
-    drawBars(freqData, w, h);
-  } else if (vizMode === "radial"){
-    analyser.getByteFrequencyData(freqData);
-    drawRadial(freqData, w, h);
-  } else if (vizMode === "phono"){
-    analyser.getByteFrequencyData(freqData);
-    drawPhono(freqData, w, h);
-  } else if (vizMode === "particles"){
-    analyser.getByteFrequencyData(freqData);
-    drawParticles(freqData, w, h);
-  }
-}
-
-function drawOsc(data, w, h){
-  const mid = h * 0.56;
-  const amp = h * 0.20;
-
-  vizCtx.lineWidth = 2;
-  vizCtx.strokeStyle = "rgba(255,255,255,0.75)";
-  vizCtx.beginPath();
-
-  for (let i=0;i<data.length;i++){
-    const x = (i / (data.length-1)) * w;
-    const v = (data[i] - 128) / 128;
-    const y = mid + v * amp;
-    if (i === 0) vizCtx.moveTo(x,y);
-    else vizCtx.lineTo(x,y);
-  }
-  vizCtx.stroke();
-}
-
-function drawBars(data, w, h){
-  const barCount = 96;
-  const step = Math.floor(data.length / barCount);
-  const baseY = h * 0.78;
-  const maxH = h * 0.50;
-
-  const barW = Math.max(3, Math.floor(w / (barCount*1.6)));
-  const gap = Math.max(2, Math.floor(barW * 0.55));
-  let x = Math.floor((w - (barCount*(barW+gap) - gap)) / 2);
-
-  // Bass energy glow at bottom
-  const bass = avgEnergy(data, 0, Math.floor(data.length*0.10));
-  vizCtx.fillStyle = `rgba(255,255,255,${0.05 + bass*0.10})`;
-  vizCtx.fillRect(0, baseY, w, h-baseY);
-
-  for (let i=0;i<barCount;i++){
-    const v = data[i*step] / 255;
-    const bh = v * maxH;
-
-    vizCtx.fillStyle = "rgba(255,255,255,0.65)";
-    vizCtx.fillRect(x, baseY - bh, barW, bh);
-
-    x += barW + gap;
-  }
-}
-
-function drawRadial(data, w, h){
-  const cx = w/2;
-  const cy = h/2;
-  const radius = Math.min(w,h) * 0.15;
-  const spikes = 180;
-  const step = Math.floor(data.length / spikes);
-
-  // Outer glow ring responds to mids
-  const midE = avgEnergy(data, Math.floor(data.length*0.15), Math.floor(data.length*0.45));
-  vizCtx.lineWidth = 6;
-  vizCtx.strokeStyle = `rgba(255,255,255,${0.07 + midE*0.22})`;
-  vizCtx.beginPath();
-  vizCtx.arc(cx,cy,radius*1.15,0,Math.PI*2);
-  vizCtx.stroke();
-
-  vizCtx.lineWidth = 2;
-  vizCtx.strokeStyle = "rgba(255,255,255,0.70)";
-  vizCtx.beginPath();
-
-  for (let i=0;i<spikes;i++){
-    const ang = (i/spikes) * Math.PI * 2;
-    const v = data[i*step] / 255;
-    const r2 = radius + v * radius * 1.7;
-
-    const x1 = cx + Math.cos(ang) * radius;
-    const y1 = cy + Math.sin(ang) * radius;
-    const x2 = cx + Math.cos(ang) * r2;
-    const y2 = cy + Math.sin(ang) * r2;
-
-    vizCtx.moveTo(x1,y1);
-    vizCtx.lineTo(x2,y2);
-  }
-  vizCtx.stroke();
-
-  // Soft center glow
-  const g = vizCtx.createRadialGradient(cx,cy,0,cx,cy,radius*2.5);
-  g.addColorStop(0, "rgba(255,255,255,0.09)");
-  g.addColorStop(1, "rgba(255,255,255,0)");
-  vizCtx.fillStyle = g;
-  vizCtx.beginPath();
-  vizCtx.arc(cx,cy,radius*2.5,0,Math.PI*2);
-  vizCtx.fill();
-}
-
-function drawPhono(data, w, h){
-  const cx = w/2;
-  const cy = h/2;
-  const baseR = Math.min(w,h) * 0.18;
-
-  const bass = avgEnergy(data, 0, Math.floor(data.length*0.12));
-  const treble = avgEnergy(data, Math.floor(data.length*0.55), Math.floor(data.length*0.95));
-
-  phonoSpin += 0.010 + treble*0.020;
-
-  // Record disc
-  vizCtx.save();
-  vizCtx.translate(cx, cy);
-  vizCtx.rotate(phonoSpin);
-
-  // Outer disc
-  vizCtx.fillStyle = "rgba(255,255,255,0.08)";
-  vizCtx.beginPath();
-  vizCtx.arc(0,0,baseR*1.65,0,Math.PI*2);
-  vizCtx.fill();
-
-  // Grooves (concentric rings)
-  const rings = 26;
-  for (let i=0;i<rings;i++){
-    const r = baseR*0.55 + (i/rings) * baseR*1.05;
-    const a = 0.05 + treble*0.08;
-    vizCtx.strokeStyle = `rgba(255,255,255,${a})`;
-    vizCtx.lineWidth = 1;
-    vizCtx.beginPath();
-    vizCtx.arc(0,0,r,0,Math.PI*2);
-    vizCtx.stroke();
-  }
-
-  // Center label pulse
-  const pulse = 1 + bass*0.40;
-  vizCtx.fillStyle = `rgba(255,255,255,${0.10 + bass*0.18})`;
-  vizCtx.beginPath();
-  vizCtx.arc(0,0,baseR*0.32*pulse,0,Math.PI*2);
-  vizCtx.fill();
-
-  // Spindle hole
-  vizCtx.fillStyle = "rgba(0,0,0,0.35)";
-  vizCtx.beginPath();
-  vizCtx.arc(0,0,baseR*0.06,0,Math.PI*2);
-  vizCtx.fill();
-
-  vizCtx.restore();
-
-  // Pulse ring around disc
-  vizCtx.lineWidth = 4;
-  vizCtx.strokeStyle = `rgba(255,255,255,${0.08 + bass*0.28})`;
-  vizCtx.beginPath();
-  vizCtx.arc(cx,cy,baseR*1.85*(1 + bass*0.18),0,Math.PI*2);
-  vizCtx.stroke();
-}
-
-function drawParticles(data, w, h){
-  // Energy controls particle speed + brightness
-  const bass = avgEnergy(data, 0, Math.floor(data.length*0.12));
-  const mid = avgEnergy(data, Math.floor(data.length*0.15), Math.floor(data.length*0.45));
-
-  const speed = 0.35 + bass*1.15;
-
-  // fade trail
-  vizCtx.fillStyle = "rgba(0,0,0,0.10)";
-  vizCtx.fillRect(0,0,w,h);
-
-  for (const p of particles){
-    p.x += p.vx * speed;
-    p.y += p.vy * speed;
-
-    // wrap
-    if (p.x < -10) p.x = w+10;
-    if (p.x > w+10) p.x = -10;
-    if (p.y < -10) p.y = h+10;
-    if (p.y > h+10) p.y = -10;
-
-    const glow = 0.10 + mid*0.35;
-    vizCtx.fillStyle = `rgba(255,255,255,${p.a + glow})`;
-    vizCtx.beginPath();
-    vizCtx.arc(p.x,p.y,p.r*(1+bass*0.6),0,Math.PI*2);
-    vizCtx.fill();
-  }
-
-  // subtle linking lines (only if not too many)
-  if (particles.length <= 120){
-    vizCtx.strokeStyle = `rgba(255,255,255,${0.03 + mid*0.06})`;
-    vizCtx.lineWidth = 1;
-    for (let i=0;i<particles.length;i++){
-      for (let j=i+1;j<particles.length;j++){
-        const a = particles[i], b = particles[j];
-        const dx = a.x - b.x, dy = a.y - b.y;
-        const d2 = dx*dx + dy*dy;
-        if (d2 < 9000){
-          vizCtx.beginPath();
-          vizCtx.moveTo(a.x,a.y);
-          vizCtx.lineTo(b.x,b.y);
-          vizCtx.stroke();
-        }
-      }
-    }
-  }
-}
-
-// Visualizer pills
-document.querySelectorAll("#vizRow .pill").forEach(p => {
-  p.addEventListener("click", () => setVisualizer(p.dataset.viz));
-});
-
-/* =========================
-   INIT
-========================= */
-
-function getDockEl(){
-  return document.getElementById("dock") || document.getElementById("dockWrap") || document.querySelector(".dock");
-}
-
-function setModeFromUI(newMode){
-  mode = newMode;
-  const dockEl = getDockEl();
-
-  btnModeChannel?.classList.toggle("active", mode === "channel");
-  btnModeShow?.classList.toggle("active", mode === "show");
-
-  // Channel buttons only in Channel mode
-  safeShow(dockEl, mode === "channel");
-  // Show dropdown only in Show mode
-  safeShow(showPickerPanel, mode === "show");
-
-  setModeUI();
-}
-
-
-pillListenChannel?.addEventListener("click", () => {
-  setModeFromUI("channel");
-});
-
-pillListenShow?.addEventListener("click", () => {
-  setModeFromUI("show");
-  // No autoplay — wait until a show is selected.
-});
-
-
-showSelectInline?.addEventListener("change", () => {
-  const v = showSelectInline.value;
-  if (v === "__all__" || !v) return;
-
-  currentShow = v;
-  showTracks = buildShowTracks(currentShow);
-  renderEpisodes();
-  setModeFromUI("show");
-  playShowIndex(0, true);
-});
-
-});
-
-  // No autoplay — wait for show selection
-});
-
-// Visualizer buttons on main page
-vizStrip?.querySelectorAll("[data-viz]")?.forEach(btn => {
-  btn.addEventListener("click", () => {
-    const v = btn.getAttribute("data-viz");
-    vizStrip.querySelectorAll("[data-viz]").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    setVisualizer(v);
-  });
-});
-
-
-
-async function init(){
-  setModeUI();
-  renderDock();
-  setModeFromUI("channel");
-  setModeFromUI("channel");
-  renderModalChannels();
-  setVolume(0.6);
-  syncVolMain();
-  syncVolMain();
-  setVisualizer("none");
-  trackTitleEl.textContent = "Loading library…";
-  metaLineEl.textContent = "—";
-  statusHintEl.textContent = "Fetching shows.json…";
-
-  // Robust JSON loading for GitHub Pages + local testing
-  const path = window.location.pathname || "/";
-  const parts = path.split("/").filter(Boolean);
-  const repoBase = parts.length ? `/${parts[0]}/` : "/";
-
-  const candidates = [
-    "./shows.json",
-    "shows.json",
-    repoBase + "shows.json"
+  // ---------- DOM ----------
+  const pillListenChannel = document.getElementById("pillListenChannel");
+  const pillListenShow = document.getElementById("pillListenShow");
+  const dock = document.getElementById("dock");
+  const showPanel = document.getElementById("showPanel");
+  const showSelectInline = document.getElementById("showSelectInline");
+  const episodeBox = document.getElementById("episodeBox");
+
+  const nowTitle = document.getElementById("nowTitle");
+  const nowMeta  = document.getElementById("nowMeta");
+
+  const btnPrev = document.getElementById("btnPrev");
+  const btnPlay = document.getElementById("btnPlay");
+  const btnNext = document.getElementById("btnNext");
+  const btnStop = document.getElementById("btnStop");
+
+  const seek = document.getElementById("seek");
+  const tCur = document.getElementById("tCur");
+  const tDur = document.getElementById("tDur");
+  const volMain = document.getElementById("volMain");
+
+  const audioEl = document.getElementById("audio");
+  audioEl.volume = Number(volMain.value || 0.6);
+
+  // ---------- app state ----------
+  let mode = "channel"; // "channel" | "show"
+  let allTracks = [];
+  let showIndex = new Map(); // showKey -> {name, tracks}
+  let currentShowKey = null;
+  let currentQueue = [];     // playing queue in current mode
+  let currentIdx = -1;       // index within currentQueue
+  let currentKey = "";       // for episode highlight in show list
+
+  // Channels are heuristic because your JSON currently has no tags.
+  const CHANNELS = [
+    { id:"detective", label:"Detective",  test: s => /detective|sleuth|noir|private|marlowe|falcon|regan|diamond|wolfe|dollar|drew|broadway|beat/i.test(s) },
+    { id:"mystery",   label:"Mystery",    test: s => /mystery|whistler|murder|case|investigation/i.test(s) },
+    { id:"suspense",  label:"Suspense",   test: s => /suspense|terror|thriller/i.test(s) },
+    { id:"horror",    label:"Horror",     test: s => /horror|haunt|ghost|vamp|demon|weird|night|dark/i.test(s) },
+    { id:"scifi",     label:"Sci‑Fi",     test: s => /x minus|x\-minus|science|space|planet|alien|robot|twilight|zone/i.test(s) },
+    { id:"western",   label:"Western",    test: s => /gunsmoke|six shooter|ranger|west|cowboy|texas/i.test(s) },
+    { id:"comedy",    label:"Comedy",     test: s => /comedy|molly|mcgee|jack benny|burns|allen|lucille|abbott|costello/i.test(s) },
+    { id:"theater",   label:"Radio Theater", test: s => /radio mystery theater|cbs radio|playhouse|theater|theatre/i.test(s) },
+    { id:"all",       label:"All",        test: _ => true },
   ];
 
-  async function tryLoad(url){
-    console.log("Trying JSON:", url);
-    const res = await fetch(url, { cache: "no-store" });
-    if (!res.ok) throw new Error(`Fetch failed: ${res.status} ${res.statusText}`);
-    const data = await res.json();
-    if (!Array.isArray(data)) throw new Error("JSON loaded but it is not an array.");
-    return data;
+  let currentChannelId = "detective";
+
+  // ---------- mode switching (ROOT PILLS) ----------
+  function setModeFromUI(newMode){
+    mode = newMode;
+    pillListenChannel.classList.toggle("active", mode === "channel");
+    pillListenShow.classList.toggle("active", mode === "show");
+    safeShow(dock, mode === "channel");
+    safeShow(showPanel, mode === "show");
+    // Do NOT autoplay when switching into show mode.
+    updateNowPlayingUI();
   }
 
-  try{
-    let loadedFrom = null;
-    let data = null;
-    let lastErr = null;
+  pillListenChannel.addEventListener("click", () => setModeFromUI("channel"));
+  pillListenShow.addEventListener("click", () => setModeFromUI("show"));
 
-    for (const url of candidates){
+  // ---------- build indexes ----------
+  function normShowName(t){
+    return (t.showTitle || t.show || "").trim();
+  }
+  function buildShowIndex(){
+    showIndex = new Map();
+    for(const t of allTracks){
+      const key = (t.show || normShowName(t)).toLowerCase();
+      if(!showIndex.has(key)){
+        showIndex.set(key, { key, name: normShowName(t) || t.show || "Unknown", tracks: [] });
+      }
+      showIndex.get(key).tracks.push(t);
+    }
+    // Optional sort for stability
+    for(const v of showIndex.values()){
+      v.tracks.sort((a,b) => String(a.displayTitle||a.title||"").localeCompare(String(b.displayTitle||b.title||"")));
+    }
+  }
+
+  function populateShowSelect(){
+    const items = Array.from(showIndex.values())
+      .sort((a,b) => a.name.localeCompare(b.name))
+      .map(v => ({ value: v.key, label: v.name }));
+
+    showSelectInline.innerHTML = `<option value="__all__">Select a show…</option>` +
+      items.map(it => `<option value="${escapeHtml(it.value)}">${escapeHtml(it.label)}</option>`).join("");
+  }
+
+  // ---------- channels ----------
+  function buildChannelQueue(channelId){
+    const ch = CHANNELS.find(x => x.id === channelId) || CHANNELS[CHANNELS.length-1];
+    // Choose representative text for classification
+    const tracks = allTracks.filter(t => ch.test(`${normShowName(t)} ${t.title||""}`));
+    // Shuffle lightly (Fisher-Yates)
+    const arr = tracks.slice();
+    for(let i=arr.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [arr[i],arr[j]] = [arr[j],arr[i]];
+    }
+    return arr;
+  }
+
+  function renderDock(){
+    dock.innerHTML = "";
+    for(const ch of CHANNELS){
+      if(ch.id === "all") continue; // keep All but place at end visually
+    }
+    const ordered = [...CHANNELS.filter(c=>c.id!=="all"), CHANNELS.find(c=>c.id==="all")].filter(Boolean);
+
+    ordered.forEach(ch => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "dockBtn" + (ch.id === currentChannelId ? " active" : "");
+      b.textContent = ch.label;
+      b.addEventListener("click", () => {
+        currentChannelId = ch.id;
+        Array.from(dock.querySelectorAll(".dockBtn")).forEach(x => x.classList.remove("active"));
+        b.classList.add("active");
+
+        // Switch to channel mode and start playing immediately (radio behavior)
+        setModeFromUI("channel");
+        currentQueue = buildChannelQueue(currentChannelId);
+        currentIdx = 0;
+        playIndex(currentIdx, true);
+      });
+      dock.appendChild(b);
+    });
+  }
+
+  // ---------- show mode rendering ----------
+  function renderEpisodes(){
+    episodeBox.innerHTML = "";
+    if(!currentShowKey){
+      episodeBox.innerHTML = `<div style="padding:12px;color:rgba(255,255,255,.70)">Pick a show to see episodes.</div>`;
+      return;
+    }
+    const group = showIndex.get(currentShowKey);
+    if(!group || !group.tracks.length){
+      episodeBox.innerHTML = `<div style="padding:12px;color:rgba(255,255,255,.70)">No episodes found for this show.</div>`;
+      return;
+    }
+    group.tracks.forEach((t, idx) => {
+      const key = `show|${currentShowKey}|${idx}`;
+      const row = document.createElement("div");
+      row.className = "epRow" + (key === currentKey ? " active" : "");
+      row.innerHTML = `<div class="epTitle">${escapeHtml(t.displayTitle || t.title || "Untitled")}</div>
+                       <div class="epMeta">${t.durationSeconds ? escapeHtml(fmtTime(t.durationSeconds)) : ""}</div>`;
+      row.addEventListener("click", () => {
+        currentQueue = group.tracks;
+        currentIdx = idx;
+        currentKey = key;
+        highlightEpisode();
+        playIndex(currentIdx, true);
+      });
+      episodeBox.appendChild(row);
+    });
+  }
+
+  function highlightEpisode(){
+    episodeBox.querySelectorAll(".epRow").forEach(r => r.classList.remove("active"));
+    const match = episodeBox.querySelector(`.epRow[data-key="${CSS.escape(currentKey)}"]`);
+    if(match) match.classList.add("active");
+  }
+
+  showSelectInline.addEventListener("change", () => {
+    const v = showSelectInline.value;
+    if(!v || v === "__all__"){
+      currentShowKey = null;
+      currentQueue = [];
+      currentIdx = -1;
+      currentKey = "";
+      renderEpisodes();
+      updateNowPlayingUI();
+      return;
+    }
+    currentShowKey = v;
+    // Show mode should be visible; no autoplay until selection (but selecting a show is the user action)
+    setModeFromUI("show");
+    currentQueue = showIndex.get(currentShowKey)?.tracks || [];
+    currentIdx = -1; // do not start until user clicks an episode OR presses Play
+    currentKey = "";
+    renderEpisodes();
+    updateNowPlayingUI();
+  });
+
+  // ---------- audio control ----------
+  let userSeeking = false;
+
+  function setPlayButton(isPlaying){
+    btnPlay.textContent = isPlaying ? "Pause" : "Play";
+  }
+
+  function updateNowPlayingUI(){
+    if(mode === "channel"){
+      const name = (CHANNELS.find(c=>c.id===currentChannelId)?.label) || "Channel";
+      nowTitle.textContent = currentQueue[currentIdx]?.displayTitle || currentQueue[currentIdx]?.title || `Channel: ${name}`;
+      nowMeta.textContent = `Channel: ${name}`;
+    }else{
+      const showName = currentShowKey ? (showIndex.get(currentShowKey)?.name || "Show") : "Show";
+      const t = currentQueue[currentIdx];
+      nowTitle.textContent = t ? (t.displayTitle || t.title || "Untitled") : `Show: ${showName}`;
+      nowMeta.textContent = `Show mode: ${showName}`;
+    }
+  }
+
+  function loadTrack(t){
+    if(!t){
+      audioEl.removeAttribute("src");
+      audioEl.load();
+      return;
+    }
+    audioEl.src = t.url;
+    audioEl.load();
+    updateNowPlayingUI();
+  }
+
+  async function playIndex(idx, autoplay){
+    idx = clamp(idx, 0, Math.max(0, currentQueue.length-1));
+    currentIdx = idx;
+    const t = currentQueue[currentIdx];
+    loadTrack(t);
+
+    if(mode === "show" && currentShowKey){
+      currentKey = `show|${currentShowKey}|${currentIdx}`;
+      // highlight
+      episodeBox.querySelectorAll(".epRow").forEach((r,i) => {
+        const on = i === currentIdx;
+        r.classList.toggle("active", on);
+        if(on) r.scrollIntoView({block:"nearest"});
+      });
+    }
+
+    if(autoplay){
       try{
-        data = await tryLoad(url);
-        loadedFrom = url;
-        break;
+        await audioEl.play();
+        setPlayButton(true);
       }catch(e){
-        lastErr = e;
+        // autoplay blocked; keep button as Play
+        setPlayButton(false);
+      }
+    }else{
+      setPlayButton(false);
+    }
+  }
+
+  function stopPlayback(){
+    audioEl.pause();
+    audioEl.currentTime = 0;
+    setPlayButton(false);
+  }
+
+  btnPlay.addEventListener("click", async () => {
+    if(!audioEl.src){
+      // If in channel mode with no queue started yet, start at current channel
+      if(mode === "channel"){
+        currentQueue = buildChannelQueue(currentChannelId);
+        currentIdx = 0;
+        await playIndex(currentIdx, true);
+        return;
+      }
+      // In show mode: require a show selected + either an episode click or start from first
+      if(mode === "show" && currentShowKey){
+        currentQueue = showIndex.get(currentShowKey)?.tracks || [];
+        if(!currentQueue.length) return;
+        if(currentIdx < 0) currentIdx = 0;
+        await playIndex(currentIdx, true);
+        return;
+      }
+      return;
+    }
+
+    if(audioEl.paused){
+      try{ await audioEl.play(); setPlayButton(true); }catch(e){ setPlayButton(false); }
+    }else{
+      audioEl.pause();
+      setPlayButton(false);
+    }
+  });
+
+  btnPrev.addEventListener("click", () => {
+    if(!currentQueue.length) return;
+    const next = (currentIdx <= 0) ? 0 : currentIdx - 1;
+    playIndex(next, true);
+  });
+
+  btnNext.addEventListener("click", () => {
+    if(!currentQueue.length) return;
+    const next = (currentIdx >= currentQueue.length-1) ? currentQueue.length-1 : currentIdx + 1;
+    playIndex(next, true);
+  });
+
+  btnStop.addEventListener("click", stopPlayback);
+
+  volMain.addEventListener("input", () => {
+    audioEl.volume = Number(volMain.value);
+  });
+
+  audioEl.addEventListener("ended", () => {
+    // Auto-advance
+    if(!currentQueue.length) return;
+    if(currentIdx < currentQueue.length-1){
+      playIndex(currentIdx+1, true);
+    }else{
+      setPlayButton(false);
+    }
+  });
+
+  audioEl.addEventListener("timeupdate", () => {
+    if(userSeeking) return;
+    const dur = audioEl.duration || 0;
+    const cur = audioEl.currentTime || 0;
+    tCur.textContent = fmtTime(cur);
+    tDur.textContent = fmtTime(dur);
+    if(dur > 0){
+      seek.value = String(Math.floor((cur/dur)*1000));
+    }else{
+      seek.value = "0";
+    }
+  });
+
+  seek.addEventListener("input", () => { userSeeking = true; });
+  seek.addEventListener("change", () => {
+    const dur = audioEl.duration || 0;
+    if(dur > 0){
+      const pct = Number(seek.value)/1000;
+      audioEl.currentTime = dur * pct;
+    }
+    userSeeking = false;
+  });
+
+  // ---------- visualizer ----------
+  const vizCanvas = document.getElementById("vizCanvas");
+  const vctx = vizCanvas.getContext("2d");
+  const vizStrip = document.getElementById("vizStrip");
+  let vizMode = "none";
+  let audioCtx = null;
+  let analyser = null;
+  let dataArr = null;
+  let srcNode = null;
+  let particles = [];
+
+  function resizeCanvas(){
+    // match CSS size while keeping internal resolution high enough
+    const rect = vizCanvas.getBoundingClientRect();
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    vizCanvas.width = Math.floor(rect.width * dpr);
+    vizCanvas.height = Math.floor(rect.height * dpr);
+    vctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  window.addEventListener("resize", resizeCanvas);
+
+  function ensureAudioGraph(){
+    if(audioCtx) return;
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 2048;
+    dataArr = new Uint8Array(analyser.frequencyBinCount);
+    srcNode = audioCtx.createMediaElementSource(audioEl);
+    srcNode.connect(analyser);
+    analyser.connect(audioCtx.destination);
+  }
+
+  function setVisualizer(modeName){
+    vizMode = modeName;
+  }
+
+  vizStrip.querySelectorAll("[data-viz]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      vizStrip.querySelectorAll("[data-viz]").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      setVisualizer(btn.getAttribute("data-viz"));
+    });
+  });
+
+  function draw(){
+    requestAnimationFrame(draw);
+    if(!vctx) return;
+    const w = vizCanvas.getBoundingClientRect().width;
+    const h = vizCanvas.getBoundingClientRect().height;
+
+    // clear
+    vctx.clearRect(0,0,w,h);
+
+    // background glow
+    vctx.fillStyle = "rgba(0,0,0,.10)";
+    vctx.fillRect(0,0,w,h);
+
+    if(vizMode === "none") return;
+
+    ensureAudioGraph();
+    if(audioCtx && audioCtx.state === "suspended" && !audioEl.paused){
+      audioCtx.resume().catch(()=>{});
+    }
+
+    analyser.getByteFrequencyData(dataArr);
+
+    if(vizMode === "bars"){
+      const bars = 64;
+      const step = Math.floor(dataArr.length / bars);
+      const bw = w / bars;
+      for(let i=0;i<bars;i++){
+        const v = dataArr[i*step] / 255;
+        const bh = v * (h*0.80);
+        vctx.fillStyle = `rgba(245,194,75,${0.15 + v*0.75})`;
+        vctx.fillRect(i*bw, h-bh, bw*0.72, bh);
       }
     }
 
-    if (!data) throw lastErr || new Error("Could not load JSON from any candidate URL.");
-
-    statusHintEl.textContent = "Indexing library…";
-
-    // Precompute channel + indexes ONCE for speed
-    allTracks = data.map(t => ({...t, channel: inferredChannel(t)}));
-    console.log("Loaded tracks:", allTracks.length, "from", loadedFrom);
-
-    tracksByChannel = {};
-    for (const ch of CHANNELS) tracksByChannel[ch] = [];
-    for (const t of allTracks){
-      const ch = t.channel && CHANNELS.includes(t.channel) ? t.channel : "Drama";
-      tracksByChannel[ch].push(t);
+    if(vizMode === "wave"){
+      analyser.getByteTimeDomainData(dataArr);
+      vctx.lineWidth = 2;
+      vctx.strokeStyle = "rgba(245,194,75,.85)";
+      vctx.beginPath();
+      for(let i=0;i<dataArr.length;i++){
+        const x = (i/(dataArr.length-1))*w;
+        const y = (dataArr[i]/255)*h;
+        if(i===0) vctx.moveTo(x,y);
+        else vctx.lineTo(x,y);
+      }
+      vctx.stroke();
     }
 
-    const showSet = new Set();
-    for (const t of allTracks) showSet.add(t.show || "Unknown");
-    showsList = [...showSet].sort((a,b)=>a.localeCompare(b));
+    if(vizMode === "ring"){
+      const cx = w/2, cy = h/2;
+      const radius = Math.min(w,h)*0.22;
+      const points = 120;
+      vctx.beginPath();
+      for(let i=0;i<points;i++){
+        const idx = Math.floor(i*(dataArr.length/points));
+        const amp = (dataArr[idx]/255) * (Math.min(w,h)*0.12);
+        const a = (i/points) * Math.PI*2;
+        const r = radius + amp;
+        const x = cx + Math.cos(a)*r;
+        const y = cy + Math.sin(a)*r;
+        if(i===0) vctx.moveTo(x,y);
+        else vctx.lineTo(x,y);
+      }
+      vctx.closePath();
+      vctx.strokeStyle = "rgba(245,194,75,.85)";
+      vctx.lineWidth = 2;
+      vctx.stroke();
+      vctx.fillStyle = "rgba(245,194,75,.10)";
+      vctx.fill();
+    }
 
-    // Diagnostic line (helps confirm path without opening DevTools)
-    metaLineEl.textContent = `Data source: ${loadedFrom} • Tracks: ${allTracks.length}`;
-
-    renderShowSelect();
-    switchChannel(currentChannel, false);
-    setActiveDock();
-
-    statusHintEl.textContent = "Ready.";
-
-
-  }catch(err){
-    console.error("JSON load error:", err);
-
-    trackTitleEl.textContent = "Couldn’t load shows.json";
-    metaLineEl.textContent = String(err?.message || err);
-
-    const links = candidates.map(u => {
-      const href = new URL(u, window.location.href).toString();
-      return `<a href="${href}" target="_blank" style="color:rgba(245,194,75,.95);text-decoration:underline">${u}</a>`;
-    }).join(" • ");
-
-    statusHintEl.innerHTML =
-      `Fix: make sure <b>shows.json</b> is committed to the same folder as <b>index.html</b> in this GitHub Pages repo.<br>` +
-      `Try opening: ${links}`;
+    if(vizMode === "particles"){
+      // init
+      if(particles.length < 80){
+        particles = Array.from({length:80}, () => ({
+          x: Math.random()*w,
+          y: Math.random()*h,
+          vx: (Math.random()-.5)*0.7,
+          vy: (Math.random()-.5)*0.7,
+          r: 1 + Math.random()*2.2
+        }));
+      }
+      const energy = dataArr.reduce((a,b)=>a+b,0) / (dataArr.length*255);
+      for(const p of particles){
+        p.x += p.vx*(1+energy*2.4);
+        p.y += p.vy*(1+energy*2.4);
+        if(p.x<0) p.x=w;
+        if(p.x>w) p.x=0;
+        if(p.y<0) p.y=h;
+        if(p.y>h) p.y=0;
+        vctx.beginPath();
+        vctx.fillStyle = `rgba(245,194,75,${0.10 + energy*0.75})`;
+        vctx.arc(p.x,p.y,p.r*(1+energy*1.7),0,Math.PI*2);
+        vctx.fill();
+      }
+    }
   }
-}
 
-init();
+  // Start draw loop after layout paint
+  window.addEventListener("load", () => {
+    resizeCanvas();
+    requestAnimationFrame(draw);
+  });
 
-</script>
+  // ---------- load JSON ----------
+  async function loadShowsJson(){
+    const url = "./shows.json";
+    console.log("Trying JSON:", url);
+    const res = await fetch(url, { cache: "no-store" });
+    if(!res.ok) throw new Error("Failed to load shows.json: " + res.status);
+    const json = await res.json();
+    if(!Array.isArray(json)) throw new Error("shows.json is not an array");
+    return json;
+  }
+
+  async function init(){
+    // default UI
+    setModeFromUI("channel");
+
+    // load tracks
+    allTracks = await loadShowsJson();
+    console.log("Loaded tracks:", allTracks.length);
+
+    buildShowIndex();
+    populateShowSelect();
+    renderDock();
+
+    // Prime channel queue but don't autoplay until user presses Play or taps a channel
+    currentQueue = buildChannelQueue(currentChannelId);
+    currentIdx = -1;
+    nowTitle.textContent = "Ready.";
+    nowMeta.textContent = "Pick a channel, or switch to Show mode to browse programs.";
+    tCur.textContent = "0:00";
+    tDur.textContent = "0:00";
+  }
+
+  init().catch(err => {
+    console.error(err);
+    nowTitle.textContent = "Couldn’t load shows.json";
+    nowMeta.textContent = String(err?.message || err);
+  });
+  </script>
 </body>
 </html>
