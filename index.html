@@ -580,7 +580,7 @@
 
   // ---------- load JSON ----------
   async function loadShowsJson(){
-    const url = "./shows.json";
+    const url = "https://raw.githubusercontent.com/WonderMan33/golden-radio-mp3/main/shows.json?v=5";
     const res = await fetch(url, { cache:"no-store" });
     if(!res.ok) throw new Error("Failed to load shows.json: " + res.status);
     const json = await res.json();
